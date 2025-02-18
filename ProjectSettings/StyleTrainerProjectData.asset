@@ -1,0 +1,1182 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &1
+MonoBehaviour:
+  m_ObjectHideFlags: 53
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e07c9b2c97f84356bb2bfac29363e611, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_StyleTrainerData:
+    rid: 1138254427292172539
+  m_DefaultStyleData:
+    rid: 1138254427292172540
+  m_DefaultStyleVersion: 2023111600
+  m_DefaultStyles:
+  - rid: 1138254427292172541
+  m_AssetPath: 
+  m_PreviousProjectIDs: []
+  references:
+    version: 2
+    RefIds:
+    - rid: -2
+      type: {class: , ns: , asm: }
+    - rid: 1138254427292172539
+      type: {class: StyleTrainerData, ns: Unity.Muse.StyleTrainer, asm: Unity.Muse.StyleTrainer}
+      data:
+        m_Guid: 4358738a-5602-450e-bb56-803a22cbefce
+        m_State: 1
+        m_Disposing: 0
+        m_Styles:
+        - rid: 1138254427292172543
+        - rid: 1138254427292172944
+        - rid: 1138254439193247863
+        m_Version: 202231001
+    - rid: 1138254427292172540
+      type: {class: StyleTrainerData, ns: Unity.Muse.StyleTrainer, asm: Unity.Muse.StyleTrainer}
+      data:
+        m_Guid: 11000000-0000-0000-0000-000000000011
+        m_State: 1
+        m_Disposing: 0
+        m_Styles:
+        - rid: 1138254448702259367
+        m_Version: 202231001
+    - rid: 1138254427292172541
+      type: {class: StyleData, ns: Unity.Muse.StyleTrainer, asm: Unity.Muse.StyleTrainer}
+      data:
+        m_Guid: 00000000-0000-0000-0000-000000000000
+        m_State: 1
+        m_Disposing: 0
+        m_IsFallback: 1
+        m_Thumbnail:
+          rid: -2
+        m_Visible: 0
+        selectedCheckPointGUID: 00000000-0000-0000-0000-000000000000
+        m_FavoriteCheckPointGUID: active
+        parentID: 00000000-0000-0000-0000-000000000000
+        m_ProjectID: 00000000-0000-0000-0000-000000000000
+        m_TrainingSteps: 2000
+        m_CheckPoints:
+        - m_Guid: 00000000-0000-0000-0000-000000000000
+          m_State: 1
+          m_Disposing: 0
+          m_ProjectID: 00000000-0000-0000-0000-000000000000
+          m_Name: Default
+          m_Description: Default style.
+          parent_id: 00000000-0000-0000-0000-000000000000
+          m_TrainingSetData:
+            m_Guid: 
+            m_State: 0
+            m_Disposing: 0
+            m_TrainingSet: []
+            m_ProjectID: 
+          m_ValidationImagesData: []
+          m_FavoriteSampleOutputDataGuid: 
+          m_TrainingSteps: 2000
+        m_SampleOutputPrompts: []
+        m_TrainingSetData: []
+        m_Name: Default
+        m_Description: Default style.
+    - rid: 1138254427292172543
+      type: {class: StyleData, ns: Unity.Muse.StyleTrainer, asm: Unity.Muse.StyleTrainer}
+      data:
+        m_Guid: ddb04e7d-cf72-4866-988f-6f8e2d9492c5
+        m_State: 1
+        m_Disposing: 0
+        m_IsFallback: 0
+        m_Thumbnail:
+          rid: 1138254427292172544
+        m_Visible: 0
+        selectedCheckPointGUID: 5ac380bd-0ba3-47c1-8279-89522a9ec0ce
+        m_FavoriteCheckPointGUID: 31233c37-9f23-4236-8ca5-f241d0fd9b8a
+        parentID: 00000000-0000-0000-0000-000000000000
+        m_ProjectID: 4358738a-5602-450e-bb56-803a22cbefce
+        m_TrainingSteps: 2000
+        m_CheckPoints:
+        - m_Guid: 61891ff2-9bb5-4eb4-bd74-a60135c7f017
+          m_State: 1
+          m_Disposing: 0
+          m_ProjectID: 4358738a-5602-450e-bb56-803a22cbefce
+          m_Name: Animal
+          m_Description: animals
+          parent_id: 00000000-0000-0000-0000-000000000000
+          m_TrainingSetData:
+            m_Guid: bfa7b26f-9bc4-4bff-a39e-12af8b2e907f
+            m_State: 5
+            m_Disposing: 1
+            m_TrainingSet: []
+            m_ProjectID: 4358738a-5602-450e-bb56-803a22cbefce
+          m_ValidationImagesData:
+          - m_Guid: 28b6eea9-f816-4c99-82d1-64a7c6540698
+            m_State: 5
+            m_Disposing: 1
+            m_ImageArtifact:
+              m_Guid: 28b6eea9-f816-4c99-82d1-64a7c6540698
+              m_State: 1
+              m_Disposing: 1
+            m_Prompt: panda
+          - m_Guid: 86f372a3-effb-4004-9869-6321924d3ad9
+            m_State: 5
+            m_Disposing: 1
+            m_ImageArtifact:
+              m_Guid: 86f372a3-effb-4004-9869-6321924d3ad9
+              m_State: 1
+              m_Disposing: 1
+            m_Prompt: polarbear
+          - m_Guid: 14bae705-d173-4136-8827-a7726f75ce18
+            m_State: 5
+            m_Disposing: 1
+            m_ImageArtifact:
+              m_Guid: 14bae705-d173-4136-8827-a7726f75ce18
+              m_State: 1
+              m_Disposing: 1
+            m_Prompt: donkey
+          m_FavoriteSampleOutputDataGuid: 28b6eea9-f816-4c99-82d1-64a7c6540698
+          m_TrainingSteps: 200
+        - m_Guid: 31233c37-9f23-4236-8ca5-f241d0fd9b8a
+          m_State: 1
+          m_Disposing: 0
+          m_ProjectID: 4358738a-5602-450e-bb56-803a22cbefce
+          m_Name: Animal
+          m_Description: animals
+          parent_id: 00000000-0000-0000-0000-000000000000
+          m_TrainingSetData:
+            m_Guid: bfa7b26f-9bc4-4bff-a39e-12af8b2e907f
+            m_State: 5
+            m_Disposing: 1
+            m_TrainingSet: []
+            m_ProjectID: 4358738a-5602-450e-bb56-803a22cbefce
+          m_ValidationImagesData:
+          - m_Guid: 934299df-f2fe-4466-9286-d22fe4d9e863
+            m_State: 5
+            m_Disposing: 1
+            m_ImageArtifact:
+              m_Guid: 934299df-f2fe-4466-9286-d22fe4d9e863
+              m_State: 1
+              m_Disposing: 1
+            m_Prompt: panda
+          - m_Guid: 37589bea-68e1-40a0-86d8-bcd1956c8a80
+            m_State: 5
+            m_Disposing: 1
+            m_ImageArtifact:
+              m_Guid: 37589bea-68e1-40a0-86d8-bcd1956c8a80
+              m_State: 1
+              m_Disposing: 1
+            m_Prompt: polarbear
+          - m_Guid: 3449f6f6-07be-4b70-ae77-ab131244fc98
+            m_State: 5
+            m_Disposing: 1
+            m_ImageArtifact:
+              m_Guid: 3449f6f6-07be-4b70-ae77-ab131244fc98
+              m_State: 1
+              m_Disposing: 1
+            m_Prompt: donkey
+          m_FavoriteSampleOutputDataGuid: 934299df-f2fe-4466-9286-d22fe4d9e863
+          m_TrainingSteps: 400
+        - m_Guid: 0fa18f65-38fa-4c6b-97f1-dc4c1701474a
+          m_State: 1
+          m_Disposing: 0
+          m_ProjectID: 4358738a-5602-450e-bb56-803a22cbefce
+          m_Name: Animal
+          m_Description: animals
+          parent_id: 00000000-0000-0000-0000-000000000000
+          m_TrainingSetData:
+            m_Guid: bfa7b26f-9bc4-4bff-a39e-12af8b2e907f
+            m_State: 5
+            m_Disposing: 1
+            m_TrainingSet: []
+            m_ProjectID: 4358738a-5602-450e-bb56-803a22cbefce
+          m_ValidationImagesData:
+          - m_Guid: 54ee879d-6332-43bc-bd7c-91af400ab6db
+            m_State: 5
+            m_Disposing: 1
+            m_ImageArtifact:
+              m_Guid: 54ee879d-6332-43bc-bd7c-91af400ab6db
+              m_State: 1
+              m_Disposing: 1
+            m_Prompt: panda
+          - m_Guid: d7109846-21f3-447d-a75b-30f0dbe6ce8f
+            m_State: 5
+            m_Disposing: 1
+            m_ImageArtifact:
+              m_Guid: d7109846-21f3-447d-a75b-30f0dbe6ce8f
+              m_State: 1
+              m_Disposing: 1
+            m_Prompt: polarbear
+          - m_Guid: ca096199-3d66-4d96-bb69-721cc275a014
+            m_State: 5
+            m_Disposing: 1
+            m_ImageArtifact:
+              m_Guid: ca096199-3d66-4d96-bb69-721cc275a014
+              m_State: 1
+              m_Disposing: 1
+            m_Prompt: donkey
+          m_FavoriteSampleOutputDataGuid: 
+          m_TrainingSteps: 600
+        - m_Guid: 42523444-652f-41cb-8c80-3b869625e2aa
+          m_State: 1
+          m_Disposing: 0
+          m_ProjectID: 4358738a-5602-450e-bb56-803a22cbefce
+          m_Name: Animal
+          m_Description: animals
+          parent_id: 00000000-0000-0000-0000-000000000000
+          m_TrainingSetData:
+            m_Guid: bfa7b26f-9bc4-4bff-a39e-12af8b2e907f
+            m_State: 5
+            m_Disposing: 1
+            m_TrainingSet: []
+            m_ProjectID: 4358738a-5602-450e-bb56-803a22cbefce
+          m_ValidationImagesData:
+          - m_Guid: f08b06c8-74a0-48a6-9831-8c49fd541365
+            m_State: 5
+            m_Disposing: 1
+            m_ImageArtifact:
+              m_Guid: f08b06c8-74a0-48a6-9831-8c49fd541365
+              m_State: 1
+              m_Disposing: 1
+            m_Prompt: panda
+          - m_Guid: b06e16a0-5fd0-4c5b-b304-f3872c690885
+            m_State: 5
+            m_Disposing: 1
+            m_ImageArtifact:
+              m_Guid: b06e16a0-5fd0-4c5b-b304-f3872c690885
+              m_State: 1
+              m_Disposing: 1
+            m_Prompt: polarbear
+          - m_Guid: ddcc85a7-b1b8-4ed3-8aac-31731e123d17
+            m_State: 5
+            m_Disposing: 1
+            m_ImageArtifact:
+              m_Guid: ddcc85a7-b1b8-4ed3-8aac-31731e123d17
+              m_State: 1
+              m_Disposing: 1
+            m_Prompt: donkey
+          m_FavoriteSampleOutputDataGuid: 
+          m_TrainingSteps: 800
+        - m_Guid: 22e8331e-b895-416a-a655-99dcd15c296a
+          m_State: 1
+          m_Disposing: 0
+          m_ProjectID: 4358738a-5602-450e-bb56-803a22cbefce
+          m_Name: Animal
+          m_Description: animals
+          parent_id: 00000000-0000-0000-0000-000000000000
+          m_TrainingSetData:
+            m_Guid: bfa7b26f-9bc4-4bff-a39e-12af8b2e907f
+            m_State: 5
+            m_Disposing: 1
+            m_TrainingSet: []
+            m_ProjectID: 4358738a-5602-450e-bb56-803a22cbefce
+          m_ValidationImagesData:
+          - m_Guid: 79ce1925-0b4c-4bf5-96c1-a9819e18177b
+            m_State: 5
+            m_Disposing: 1
+            m_ImageArtifact:
+              m_Guid: 79ce1925-0b4c-4bf5-96c1-a9819e18177b
+              m_State: 1
+              m_Disposing: 1
+            m_Prompt: panda
+          - m_Guid: 28e42e48-c5fc-4af2-8d6b-3047fb1f7871
+            m_State: 5
+            m_Disposing: 1
+            m_ImageArtifact:
+              m_Guid: 28e42e48-c5fc-4af2-8d6b-3047fb1f7871
+              m_State: 1
+              m_Disposing: 1
+            m_Prompt: polarbear
+          - m_Guid: 3047a18c-3336-446d-9ee1-be713d1a4bfe
+            m_State: 5
+            m_Disposing: 1
+            m_ImageArtifact:
+              m_Guid: 3047a18c-3336-446d-9ee1-be713d1a4bfe
+              m_State: 1
+              m_Disposing: 1
+            m_Prompt: donkey
+          m_FavoriteSampleOutputDataGuid: 
+          m_TrainingSteps: 1000
+        - m_Guid: 46073042-0ff0-446a-9846-3288756e1557
+          m_State: 1
+          m_Disposing: 0
+          m_ProjectID: 4358738a-5602-450e-bb56-803a22cbefce
+          m_Name: Animal
+          m_Description: animals
+          parent_id: 00000000-0000-0000-0000-000000000000
+          m_TrainingSetData:
+            m_Guid: bfa7b26f-9bc4-4bff-a39e-12af8b2e907f
+            m_State: 5
+            m_Disposing: 1
+            m_TrainingSet: []
+            m_ProjectID: 4358738a-5602-450e-bb56-803a22cbefce
+          m_ValidationImagesData:
+          - m_Guid: 9fe95996-4077-4c73-a842-1d60063c0e08
+            m_State: 5
+            m_Disposing: 1
+            m_ImageArtifact:
+              m_Guid: 9fe95996-4077-4c73-a842-1d60063c0e08
+              m_State: 1
+              m_Disposing: 1
+            m_Prompt: panda
+          - m_Guid: deba895e-9280-460e-a3fe-674e13d985ba
+            m_State: 5
+            m_Disposing: 1
+            m_ImageArtifact:
+              m_Guid: deba895e-9280-460e-a3fe-674e13d985ba
+              m_State: 1
+              m_Disposing: 1
+            m_Prompt: polarbear
+          - m_Guid: 45a3cdf8-15cc-40b8-9133-13be6691b4e1
+            m_State: 5
+            m_Disposing: 1
+            m_ImageArtifact:
+              m_Guid: 45a3cdf8-15cc-40b8-9133-13be6691b4e1
+              m_State: 1
+              m_Disposing: 1
+            m_Prompt: donkey
+          m_FavoriteSampleOutputDataGuid: 
+          m_TrainingSteps: 1200
+        - m_Guid: dcd86a41-ddb2-45a3-add9-c70bcfba5408
+          m_State: 1
+          m_Disposing: 0
+          m_ProjectID: 4358738a-5602-450e-bb56-803a22cbefce
+          m_Name: Animal
+          m_Description: animals
+          parent_id: 00000000-0000-0000-0000-000000000000
+          m_TrainingSetData:
+            m_Guid: bfa7b26f-9bc4-4bff-a39e-12af8b2e907f
+            m_State: 5
+            m_Disposing: 1
+            m_TrainingSet: []
+            m_ProjectID: 4358738a-5602-450e-bb56-803a22cbefce
+          m_ValidationImagesData:
+          - m_Guid: 12b5a6a1-5b03-4a5a-9832-09267743f52a
+            m_State: 5
+            m_Disposing: 1
+            m_ImageArtifact:
+              m_Guid: 12b5a6a1-5b03-4a5a-9832-09267743f52a
+              m_State: 1
+              m_Disposing: 1
+            m_Prompt: panda
+          - m_Guid: a188da37-10eb-4a50-9920-1642221dc0f3
+            m_State: 5
+            m_Disposing: 1
+            m_ImageArtifact:
+              m_Guid: a188da37-10eb-4a50-9920-1642221dc0f3
+              m_State: 1
+              m_Disposing: 1
+            m_Prompt: polarbear
+          - m_Guid: 7dd3ae14-de1f-46c2-8003-5881f903103a
+            m_State: 5
+            m_Disposing: 1
+            m_ImageArtifact:
+              m_Guid: 7dd3ae14-de1f-46c2-8003-5881f903103a
+              m_State: 1
+              m_Disposing: 1
+            m_Prompt: donkey
+          m_FavoriteSampleOutputDataGuid: 
+          m_TrainingSteps: 1400
+        - m_Guid: b8802c65-35eb-490b-908f-397309133d6f
+          m_State: 1
+          m_Disposing: 0
+          m_ProjectID: 4358738a-5602-450e-bb56-803a22cbefce
+          m_Name: Animal
+          m_Description: animals
+          parent_id: 00000000-0000-0000-0000-000000000000
+          m_TrainingSetData:
+            m_Guid: bfa7b26f-9bc4-4bff-a39e-12af8b2e907f
+            m_State: 5
+            m_Disposing: 1
+            m_TrainingSet: []
+            m_ProjectID: 4358738a-5602-450e-bb56-803a22cbefce
+          m_ValidationImagesData:
+          - m_Guid: 95c5dab4-c9e3-4caa-8787-9bde8138c7fb
+            m_State: 5
+            m_Disposing: 1
+            m_ImageArtifact:
+              m_Guid: 95c5dab4-c9e3-4caa-8787-9bde8138c7fb
+              m_State: 1
+              m_Disposing: 1
+            m_Prompt: panda
+          - m_Guid: b53d660d-4cb7-4546-aa5f-e70ab7513dac
+            m_State: 5
+            m_Disposing: 1
+            m_ImageArtifact:
+              m_Guid: b53d660d-4cb7-4546-aa5f-e70ab7513dac
+              m_State: 1
+              m_Disposing: 1
+            m_Prompt: polarbear
+          - m_Guid: e0024b1d-fa0a-40d8-8878-00a944c3122a
+            m_State: 5
+            m_Disposing: 1
+            m_ImageArtifact:
+              m_Guid: e0024b1d-fa0a-40d8-8878-00a944c3122a
+              m_State: 1
+              m_Disposing: 1
+            m_Prompt: donkey
+          m_FavoriteSampleOutputDataGuid: 
+          m_TrainingSteps: 1600
+        - m_Guid: 336d2aa6-d23b-4eb5-b706-0cd06e165102
+          m_State: 1
+          m_Disposing: 0
+          m_ProjectID: 4358738a-5602-450e-bb56-803a22cbefce
+          m_Name: Animal
+          m_Description: animals
+          parent_id: 00000000-0000-0000-0000-000000000000
+          m_TrainingSetData:
+            m_Guid: bfa7b26f-9bc4-4bff-a39e-12af8b2e907f
+            m_State: 5
+            m_Disposing: 1
+            m_TrainingSet: []
+            m_ProjectID: 4358738a-5602-450e-bb56-803a22cbefce
+          m_ValidationImagesData:
+          - m_Guid: 02583362-5089-4db3-ba39-1119995bf530
+            m_State: 5
+            m_Disposing: 1
+            m_ImageArtifact:
+              m_Guid: 02583362-5089-4db3-ba39-1119995bf530
+              m_State: 1
+              m_Disposing: 1
+            m_Prompt: panda
+          - m_Guid: 427de091-f8f2-4375-98a1-7ac8f1eaf0dd
+            m_State: 5
+            m_Disposing: 1
+            m_ImageArtifact:
+              m_Guid: 427de091-f8f2-4375-98a1-7ac8f1eaf0dd
+              m_State: 1
+              m_Disposing: 1
+            m_Prompt: polarbear
+          - m_Guid: ee9b2982-f636-4cae-81a7-5cfcd1370860
+            m_State: 5
+            m_Disposing: 1
+            m_ImageArtifact:
+              m_Guid: ee9b2982-f636-4cae-81a7-5cfcd1370860
+              m_State: 1
+              m_Disposing: 1
+            m_Prompt: donkey
+          m_FavoriteSampleOutputDataGuid: 
+          m_TrainingSteps: 1800
+        - m_Guid: 5ac380bd-0ba3-47c1-8279-89522a9ec0ce
+          m_State: 1
+          m_Disposing: 0
+          m_ProjectID: 4358738a-5602-450e-bb56-803a22cbefce
+          m_Name: Animal
+          m_Description: animals
+          parent_id: 00000000-0000-0000-0000-000000000000
+          m_TrainingSetData:
+            m_Guid: bfa7b26f-9bc4-4bff-a39e-12af8b2e907f
+            m_State: 5
+            m_Disposing: 1
+            m_TrainingSet: []
+            m_ProjectID: 4358738a-5602-450e-bb56-803a22cbefce
+          m_ValidationImagesData:
+          - m_Guid: 4bff167e-c782-4283-b893-e3176fdd98cb
+            m_State: 5
+            m_Disposing: 1
+            m_ImageArtifact:
+              m_Guid: 4bff167e-c782-4283-b893-e3176fdd98cb
+              m_State: 1
+              m_Disposing: 1
+            m_Prompt: panda
+          - m_Guid: 8e938c82-d6c7-4767-a94f-58720b1102cc
+            m_State: 5
+            m_Disposing: 1
+            m_ImageArtifact:
+              m_Guid: 8e938c82-d6c7-4767-a94f-58720b1102cc
+              m_State: 1
+              m_Disposing: 1
+            m_Prompt: polarbear
+          - m_Guid: 42d615ba-7d22-4bf5-9c12-097dd37a92bf
+            m_State: 5
+            m_Disposing: 1
+            m_ImageArtifact:
+              m_Guid: 42d615ba-7d22-4bf5-9c12-097dd37a92bf
+              m_State: 1
+              m_Disposing: 1
+            m_Prompt: donkey
+          m_FavoriteSampleOutputDataGuid: 4bff167e-c782-4283-b893-e3176fdd98cb
+          m_TrainingSteps: 2000
+        m_SampleOutputPrompts:
+        - panda
+        - polarbear
+        - donkey
+        m_TrainingSetData:
+        - m_Guid: bfa7b26f-9bc4-4bff-a39e-12af8b2e907f
+          m_State: 1
+          m_Disposing: 0
+          m_TrainingSet:
+          - m_Guid: 80e999ca-89bb-4a14-a79a-edcfac51c24c
+            m_State: 5
+            m_Disposing: 0
+            m_ImageArtifact:
+              rid: 1138254439193247865
+          - m_Guid: 2a941750-4bd2-4766-bc2e-bc165cab2124
+            m_State: 5
+            m_Disposing: 0
+            m_ImageArtifact:
+              rid: 1138254439193247866
+          - m_Guid: df115384-d7f9-4e2b-8cc2-6bdc07b98c4b
+            m_State: 5
+            m_Disposing: 0
+            m_ImageArtifact:
+              rid: 1138254439193247867
+          - m_Guid: b559ad23-69e9-4974-9740-1e44a4ca5e73
+            m_State: 5
+            m_Disposing: 0
+            m_ImageArtifact:
+              rid: 1138254439193247868
+          - m_Guid: 24117f91-889d-455c-9ed2-21451795fc74
+            m_State: 5
+            m_Disposing: 0
+            m_ImageArtifact:
+              rid: 1138254439193247869
+          m_ProjectID: 4358738a-5602-450e-bb56-803a22cbefce
+        m_Name: Animal
+        m_Description: animals
+    - rid: 1138254427292172544
+      type: {class: ImageArtifact, ns: Unity.Muse.StyleTrainer, asm: Unity.Muse.StyleTrainer}
+      data:
+        m_Guid: 00000000-0000-0000-0000-000000000000
+        m_State: 3
+        m_Disposing: 1
+    - rid: 1138254427292172944
+      type: {class: StyleData, ns: Unity.Muse.StyleTrainer, asm: Unity.Muse.StyleTrainer}
+      data:
+        m_Guid: 
+        m_State: 3
+        m_Disposing: 0
+        m_IsFallback: 0
+        m_Thumbnail:
+          rid: 1138254427292172946
+        m_Visible: 1
+        selectedCheckPointGUID: 00000000-0000-0000-0000-000000000000
+        m_FavoriteCheckPointGUID: 00000000-0000-0000-0000-000000000000
+        parentID: 00000000-0000-0000-0000-000000000000
+        m_ProjectID: 4358738a-5602-450e-bb56-803a22cbefce
+        m_TrainingSteps: 2000
+        m_CheckPoints: []
+        m_SampleOutputPrompts:
+        - 
+        - 
+        - 
+        m_TrainingSetData:
+        - m_Guid: 00000000-0000-0000-0000-000000000000
+          m_State: 3
+          m_Disposing: 0
+          m_TrainingSet: []
+          m_ProjectID: 4358738a-5602-450e-bb56-803a22cbefce
+        m_Name: New Style
+        m_Description: 
+    - rid: 1138254427292172946
+      type: {class: ImageArtifact, ns: Unity.Muse.StyleTrainer, asm: Unity.Muse.StyleTrainer}
+      data:
+        m_Guid: 00000000-0000-0000-0000-000000000000
+        m_State: 3
+        m_Disposing: 1
+    - rid: 1138254439193247863
+      type: {class: StyleData, ns: Unity.Muse.StyleTrainer, asm: Unity.Muse.StyleTrainer}
+      data:
+        m_Guid: dd293c53-7bbe-4a6b-aa0d-e7b9a267db63
+        m_State: 1
+        m_Disposing: 0
+        m_IsFallback: 0
+        m_Thumbnail:
+          rid: 1138254439193247870
+        m_Visible: 1
+        selectedCheckPointGUID: 789a087a-2564-454f-a70c-a69e7f89427b
+        m_FavoriteCheckPointGUID: 00000000-0000-0000-0000-000000000000
+        parentID: 00000000-0000-0000-0000-000000000000
+        m_ProjectID: 4358738a-5602-450e-bb56-803a22cbefce
+        m_TrainingSteps: 2000
+        m_CheckPoints:
+        - m_Guid: 6686d38f-98b4-47ae-acb9-549f736590c0
+          m_State: 1
+          m_Disposing: 0
+          m_ProjectID: 4358738a-5602-450e-bb56-803a22cbefce
+          m_Name: Animals
+          m_Description: cute srites
+          parent_id: 00000000-0000-0000-0000-000000000000
+          m_TrainingSetData:
+            m_Guid: 3dc9a657-5182-4dc8-8e97-98eafd6e9352
+            m_State: 5
+            m_Disposing: 1
+            m_TrainingSet: []
+            m_ProjectID: 4358738a-5602-450e-bb56-803a22cbefce
+          m_ValidationImagesData:
+          - m_Guid: d903ce37-9285-483e-b8d3-5fae6f85de53
+            m_State: 5
+            m_Disposing: 1
+            m_ImageArtifact:
+              m_Guid: d903ce37-9285-483e-b8d3-5fae6f85de53
+              m_State: 1
+              m_Disposing: 1
+            m_Prompt: polar bear
+          - m_Guid: fcf2ed4c-6604-4b7b-b904-ef0d6394eb34
+            m_State: 5
+            m_Disposing: 1
+            m_ImageArtifact:
+              m_Guid: fcf2ed4c-6604-4b7b-b904-ef0d6394eb34
+              m_State: 1
+              m_Disposing: 1
+            m_Prompt: panda
+          - m_Guid: df87ac87-e0cb-42ea-ab5c-dfb5f1420c85
+            m_State: 5
+            m_Disposing: 1
+            m_ImageArtifact:
+              m_Guid: df87ac87-e0cb-42ea-ab5c-dfb5f1420c85
+              m_State: 1
+              m_Disposing: 1
+            m_Prompt: dog
+          m_FavoriteSampleOutputDataGuid: 
+          m_TrainingSteps: 200
+        - m_Guid: 63eaee5c-d499-4d91-809b-bd024e405b75
+          m_State: 1
+          m_Disposing: 0
+          m_ProjectID: 4358738a-5602-450e-bb56-803a22cbefce
+          m_Name: Animals
+          m_Description: cute srites
+          parent_id: 00000000-0000-0000-0000-000000000000
+          m_TrainingSetData:
+            m_Guid: 3dc9a657-5182-4dc8-8e97-98eafd6e9352
+            m_State: 5
+            m_Disposing: 1
+            m_TrainingSet: []
+            m_ProjectID: 4358738a-5602-450e-bb56-803a22cbefce
+          m_ValidationImagesData:
+          - m_Guid: 010965aa-d1ea-4b47-9b29-602c23372b35
+            m_State: 5
+            m_Disposing: 1
+            m_ImageArtifact:
+              m_Guid: 010965aa-d1ea-4b47-9b29-602c23372b35
+              m_State: 1
+              m_Disposing: 1
+            m_Prompt: polar bear
+          - m_Guid: 9430e28e-66ff-47ad-b8d6-9b6e24b7a411
+            m_State: 5
+            m_Disposing: 1
+            m_ImageArtifact:
+              m_Guid: 9430e28e-66ff-47ad-b8d6-9b6e24b7a411
+              m_State: 1
+              m_Disposing: 1
+            m_Prompt: panda
+          - m_Guid: c48bc5aa-a00b-4cd8-942d-f2278b94efbd
+            m_State: 5
+            m_Disposing: 1
+            m_ImageArtifact:
+              m_Guid: c48bc5aa-a00b-4cd8-942d-f2278b94efbd
+              m_State: 1
+              m_Disposing: 1
+            m_Prompt: dog
+          m_FavoriteSampleOutputDataGuid: 
+          m_TrainingSteps: 400
+        - m_Guid: 88a88784-8c1f-4788-bb26-3cd0267f1f5a
+          m_State: 1
+          m_Disposing: 0
+          m_ProjectID: 4358738a-5602-450e-bb56-803a22cbefce
+          m_Name: Animals
+          m_Description: cute srites
+          parent_id: 00000000-0000-0000-0000-000000000000
+          m_TrainingSetData:
+            m_Guid: 3dc9a657-5182-4dc8-8e97-98eafd6e9352
+            m_State: 5
+            m_Disposing: 1
+            m_TrainingSet: []
+            m_ProjectID: 4358738a-5602-450e-bb56-803a22cbefce
+          m_ValidationImagesData:
+          - m_Guid: f62b2bf5-9728-4826-bf3c-56fcc58707d2
+            m_State: 5
+            m_Disposing: 1
+            m_ImageArtifact:
+              m_Guid: f62b2bf5-9728-4826-bf3c-56fcc58707d2
+              m_State: 1
+              m_Disposing: 1
+            m_Prompt: polar bear
+          - m_Guid: c951504b-6a43-4d8e-b898-ed4361f28957
+            m_State: 5
+            m_Disposing: 1
+            m_ImageArtifact:
+              m_Guid: c951504b-6a43-4d8e-b898-ed4361f28957
+              m_State: 1
+              m_Disposing: 1
+            m_Prompt: panda
+          - m_Guid: 562ea767-9401-4d75-8d6b-e1040dc22575
+            m_State: 5
+            m_Disposing: 1
+            m_ImageArtifact:
+              m_Guid: 562ea767-9401-4d75-8d6b-e1040dc22575
+              m_State: 1
+              m_Disposing: 1
+            m_Prompt: dog
+          m_FavoriteSampleOutputDataGuid: 
+          m_TrainingSteps: 600
+        - m_Guid: 8c55c7db-f421-430e-9348-82901e1b4ae0
+          m_State: 1
+          m_Disposing: 0
+          m_ProjectID: 4358738a-5602-450e-bb56-803a22cbefce
+          m_Name: Animals
+          m_Description: cute srites
+          parent_id: 00000000-0000-0000-0000-000000000000
+          m_TrainingSetData:
+            m_Guid: 3dc9a657-5182-4dc8-8e97-98eafd6e9352
+            m_State: 5
+            m_Disposing: 1
+            m_TrainingSet: []
+            m_ProjectID: 4358738a-5602-450e-bb56-803a22cbefce
+          m_ValidationImagesData:
+          - m_Guid: 98376c8f-19ba-4d66-b6ce-fbf6d26a2a9c
+            m_State: 5
+            m_Disposing: 1
+            m_ImageArtifact:
+              m_Guid: 98376c8f-19ba-4d66-b6ce-fbf6d26a2a9c
+              m_State: 1
+              m_Disposing: 1
+            m_Prompt: polar bear
+          - m_Guid: 63411594-dab2-4d5d-906f-428c71292152
+            m_State: 5
+            m_Disposing: 1
+            m_ImageArtifact:
+              m_Guid: 63411594-dab2-4d5d-906f-428c71292152
+              m_State: 1
+              m_Disposing: 1
+            m_Prompt: panda
+          - m_Guid: 1b606ad1-535f-4f20-b60f-5c32fb028d34
+            m_State: 5
+            m_Disposing: 1
+            m_ImageArtifact:
+              m_Guid: 1b606ad1-535f-4f20-b60f-5c32fb028d34
+              m_State: 1
+              m_Disposing: 1
+            m_Prompt: dog
+          m_FavoriteSampleOutputDataGuid: 
+          m_TrainingSteps: 800
+        - m_Guid: a4242757-f372-48fe-846c-83742297b44f
+          m_State: 1
+          m_Disposing: 0
+          m_ProjectID: 4358738a-5602-450e-bb56-803a22cbefce
+          m_Name: Animals
+          m_Description: cute srites
+          parent_id: 00000000-0000-0000-0000-000000000000
+          m_TrainingSetData:
+            m_Guid: 3dc9a657-5182-4dc8-8e97-98eafd6e9352
+            m_State: 5
+            m_Disposing: 1
+            m_TrainingSet: []
+            m_ProjectID: 4358738a-5602-450e-bb56-803a22cbefce
+          m_ValidationImagesData:
+          - m_Guid: 7bd241fe-381d-4fd4-9e93-b5e943eb57ef
+            m_State: 5
+            m_Disposing: 1
+            m_ImageArtifact:
+              m_Guid: 7bd241fe-381d-4fd4-9e93-b5e943eb57ef
+              m_State: 1
+              m_Disposing: 1
+            m_Prompt: polar bear
+          - m_Guid: 7e575598-8168-46fc-86f3-9b28cd34a72e
+            m_State: 5
+            m_Disposing: 1
+            m_ImageArtifact:
+              m_Guid: 7e575598-8168-46fc-86f3-9b28cd34a72e
+              m_State: 1
+              m_Disposing: 1
+            m_Prompt: panda
+          - m_Guid: 89da9b0e-9d60-490a-8721-0638a842abae
+            m_State: 5
+            m_Disposing: 1
+            m_ImageArtifact:
+              m_Guid: 89da9b0e-9d60-490a-8721-0638a842abae
+              m_State: 1
+              m_Disposing: 1
+            m_Prompt: dog
+          m_FavoriteSampleOutputDataGuid: 
+          m_TrainingSteps: 1000
+        - m_Guid: 759ce871-db1e-41f2-ae26-9aa8f4d981fc
+          m_State: 1
+          m_Disposing: 0
+          m_ProjectID: 4358738a-5602-450e-bb56-803a22cbefce
+          m_Name: Animals
+          m_Description: cute srites
+          parent_id: 00000000-0000-0000-0000-000000000000
+          m_TrainingSetData:
+            m_Guid: 3dc9a657-5182-4dc8-8e97-98eafd6e9352
+            m_State: 5
+            m_Disposing: 1
+            m_TrainingSet: []
+            m_ProjectID: 4358738a-5602-450e-bb56-803a22cbefce
+          m_ValidationImagesData:
+          - m_Guid: e2a4c112-7470-4b57-8640-4c50561bbbdc
+            m_State: 5
+            m_Disposing: 1
+            m_ImageArtifact:
+              m_Guid: e2a4c112-7470-4b57-8640-4c50561bbbdc
+              m_State: 1
+              m_Disposing: 1
+            m_Prompt: polar bear
+          - m_Guid: a7a356fb-70c7-4af6-a58b-afc0afedc362
+            m_State: 5
+            m_Disposing: 1
+            m_ImageArtifact:
+              m_Guid: a7a356fb-70c7-4af6-a58b-afc0afedc362
+              m_State: 1
+              m_Disposing: 1
+            m_Prompt: panda
+          - m_Guid: 01bcee09-5b02-4c37-b9a9-0ea4f4642fe6
+            m_State: 5
+            m_Disposing: 1
+            m_ImageArtifact:
+              m_Guid: 01bcee09-5b02-4c37-b9a9-0ea4f4642fe6
+              m_State: 1
+              m_Disposing: 1
+            m_Prompt: dog
+          m_FavoriteSampleOutputDataGuid: 
+          m_TrainingSteps: 1200
+        - m_Guid: 1d41b60c-f7bf-42e9-ac96-943cd22eb8bc
+          m_State: 1
+          m_Disposing: 0
+          m_ProjectID: 4358738a-5602-450e-bb56-803a22cbefce
+          m_Name: Animals
+          m_Description: cute srites
+          parent_id: 00000000-0000-0000-0000-000000000000
+          m_TrainingSetData:
+            m_Guid: 3dc9a657-5182-4dc8-8e97-98eafd6e9352
+            m_State: 5
+            m_Disposing: 1
+            m_TrainingSet: []
+            m_ProjectID: 4358738a-5602-450e-bb56-803a22cbefce
+          m_ValidationImagesData:
+          - m_Guid: 67afa493-7f28-436a-b874-a6aba888a02b
+            m_State: 5
+            m_Disposing: 1
+            m_ImageArtifact:
+              m_Guid: 67afa493-7f28-436a-b874-a6aba888a02b
+              m_State: 1
+              m_Disposing: 1
+            m_Prompt: polar bear
+          - m_Guid: 20e1ecbe-b664-40d2-8f81-981860204837
+            m_State: 5
+            m_Disposing: 1
+            m_ImageArtifact:
+              m_Guid: 20e1ecbe-b664-40d2-8f81-981860204837
+              m_State: 1
+              m_Disposing: 1
+            m_Prompt: panda
+          - m_Guid: c10afab3-8ad1-4aba-b0e2-03702f42b2b9
+            m_State: 5
+            m_Disposing: 1
+            m_ImageArtifact:
+              m_Guid: c10afab3-8ad1-4aba-b0e2-03702f42b2b9
+              m_State: 1
+              m_Disposing: 1
+            m_Prompt: dog
+          m_FavoriteSampleOutputDataGuid: 
+          m_TrainingSteps: 1400
+        - m_Guid: 53b48294-7b4f-406a-8728-b1d813bce1d2
+          m_State: 1
+          m_Disposing: 0
+          m_ProjectID: 4358738a-5602-450e-bb56-803a22cbefce
+          m_Name: Animals
+          m_Description: cute srites
+          parent_id: 00000000-0000-0000-0000-000000000000
+          m_TrainingSetData:
+            m_Guid: 3dc9a657-5182-4dc8-8e97-98eafd6e9352
+            m_State: 5
+            m_Disposing: 1
+            m_TrainingSet: []
+            m_ProjectID: 4358738a-5602-450e-bb56-803a22cbefce
+          m_ValidationImagesData:
+          - m_Guid: 5c23dd14-1510-4a7a-99bb-497152b980e4
+            m_State: 5
+            m_Disposing: 1
+            m_ImageArtifact:
+              m_Guid: 5c23dd14-1510-4a7a-99bb-497152b980e4
+              m_State: 1
+              m_Disposing: 1
+            m_Prompt: polar bear
+          - m_Guid: 007f36ab-9969-4119-a936-19096cd312d1
+            m_State: 5
+            m_Disposing: 1
+            m_ImageArtifact:
+              m_Guid: 007f36ab-9969-4119-a936-19096cd312d1
+              m_State: 1
+              m_Disposing: 1
+            m_Prompt: panda
+          - m_Guid: 5809c333-26c5-4735-96d2-2eee7478b22c
+            m_State: 5
+            m_Disposing: 1
+            m_ImageArtifact:
+              m_Guid: 5809c333-26c5-4735-96d2-2eee7478b22c
+              m_State: 1
+              m_Disposing: 1
+            m_Prompt: dog
+          m_FavoriteSampleOutputDataGuid: 
+          m_TrainingSteps: 1600
+        - m_Guid: 8f28dafa-74c9-4ba4-b847-54760ffcaa24
+          m_State: 1
+          m_Disposing: 0
+          m_ProjectID: 4358738a-5602-450e-bb56-803a22cbefce
+          m_Name: Animals
+          m_Description: cute srites
+          parent_id: 00000000-0000-0000-0000-000000000000
+          m_TrainingSetData:
+            m_Guid: 3dc9a657-5182-4dc8-8e97-98eafd6e9352
+            m_State: 5
+            m_Disposing: 1
+            m_TrainingSet: []
+            m_ProjectID: 4358738a-5602-450e-bb56-803a22cbefce
+          m_ValidationImagesData:
+          - m_Guid: ba4f2afe-6ee5-4913-acb5-3b40daa7c229
+            m_State: 5
+            m_Disposing: 1
+            m_ImageArtifact:
+              m_Guid: ba4f2afe-6ee5-4913-acb5-3b40daa7c229
+              m_State: 1
+              m_Disposing: 1
+            m_Prompt: polar bear
+          - m_Guid: 8b23a51a-1236-4309-a0b5-d0b669e6cb53
+            m_State: 5
+            m_Disposing: 1
+            m_ImageArtifact:
+              m_Guid: 8b23a51a-1236-4309-a0b5-d0b669e6cb53
+              m_State: 1
+              m_Disposing: 1
+            m_Prompt: panda
+          - m_Guid: 5122e5ec-a6b8-4a52-85e4-01f6c0f59b4b
+            m_State: 5
+            m_Disposing: 1
+            m_ImageArtifact:
+              m_Guid: 5122e5ec-a6b8-4a52-85e4-01f6c0f59b4b
+              m_State: 1
+              m_Disposing: 1
+            m_Prompt: dog
+          m_FavoriteSampleOutputDataGuid: 
+          m_TrainingSteps: 1800
+        - m_Guid: 789a087a-2564-454f-a70c-a69e7f89427b
+          m_State: 1
+          m_Disposing: 0
+          m_ProjectID: 4358738a-5602-450e-bb56-803a22cbefce
+          m_Name: Animals
+          m_Description: cute srites
+          parent_id: 00000000-0000-0000-0000-000000000000
+          m_TrainingSetData:
+            m_Guid: 3dc9a657-5182-4dc8-8e97-98eafd6e9352
+            m_State: 5
+            m_Disposing: 1
+            m_TrainingSet: []
+            m_ProjectID: 4358738a-5602-450e-bb56-803a22cbefce
+          m_ValidationImagesData:
+          - m_Guid: 89944b25-6697-433f-abcd-a06e7f3d82f4
+            m_State: 5
+            m_Disposing: 1
+            m_ImageArtifact:
+              m_Guid: 89944b25-6697-433f-abcd-a06e7f3d82f4
+              m_State: 1
+              m_Disposing: 1
+            m_Prompt: polar bear
+          - m_Guid: 4605ff04-f6eb-405b-9229-a99d8361b8b2
+            m_State: 5
+            m_Disposing: 1
+            m_ImageArtifact:
+              m_Guid: 4605ff04-f6eb-405b-9229-a99d8361b8b2
+              m_State: 1
+              m_Disposing: 1
+            m_Prompt: panda
+          - m_Guid: 20fc01f1-8b85-42dd-a9f2-a0b3e1679379
+            m_State: 5
+            m_Disposing: 1
+            m_ImageArtifact:
+              m_Guid: 20fc01f1-8b85-42dd-a9f2-a0b3e1679379
+              m_State: 1
+              m_Disposing: 1
+            m_Prompt: dog
+          m_FavoriteSampleOutputDataGuid: 89944b25-6697-433f-abcd-a06e7f3d82f4
+          m_TrainingSteps: 2000
+        m_SampleOutputPrompts:
+        - polar bear
+        - panda
+        - dog
+        m_TrainingSetData:
+        - m_Guid: 3dc9a657-5182-4dc8-8e97-98eafd6e9352
+          m_State: 1
+          m_Disposing: 0
+          m_TrainingSet:
+          - m_Guid: 334f172b-d032-4cb6-b803-ff6200998632
+            m_State: 5
+            m_Disposing: 0
+            m_ImageArtifact:
+              rid: 1138254439193247871
+          - m_Guid: 928f2d51-924f-4853-a079-c0aed9da0837
+            m_State: 5
+            m_Disposing: 0
+            m_ImageArtifact:
+              rid: 1138254439193247872
+          - m_Guid: d86127d7-4615-42c5-a75a-6ffb56ec8e27
+            m_State: 5
+            m_Disposing: 0
+            m_ImageArtifact:
+              rid: 1138254439193247873
+          - m_Guid: 201bd52e-06d9-45fd-b0ae-4cffe8763fe6
+            m_State: 5
+            m_Disposing: 0
+            m_ImageArtifact:
+              rid: 1138254439193247874
+          - m_Guid: ec4f761c-c979-4586-8ef6-97f3f3d16852
+            m_State: 5
+            m_Disposing: 0
+            m_ImageArtifact:
+              rid: 1138254439193247875
+          m_ProjectID: 4358738a-5602-450e-bb56-803a22cbefce
+        m_Name: Animals
+        m_Description: cute srites
+    - rid: 1138254439193247865
+      type: {class: ImageArtifact, ns: Unity.Muse.StyleTrainer, asm: Unity.Muse.StyleTrainer}
+      data:
+        m_Guid: 80e999ca-89bb-4a14-a79a-edcfac51c24c
+        m_State: 1
+        m_Disposing: 1
+    - rid: 1138254439193247866
+      type: {class: ImageArtifact, ns: Unity.Muse.StyleTrainer, asm: Unity.Muse.StyleTrainer}
+      data:
+        m_Guid: 2a941750-4bd2-4766-bc2e-bc165cab2124
+        m_State: 1
+        m_Disposing: 1
+    - rid: 1138254439193247867
+      type: {class: ImageArtifact, ns: Unity.Muse.StyleTrainer, asm: Unity.Muse.StyleTrainer}
+      data:
+        m_Guid: df115384-d7f9-4e2b-8cc2-6bdc07b98c4b
+        m_State: 1
+        m_Disposing: 1
+    - rid: 1138254439193247868
+      type: {class: ImageArtifact, ns: Unity.Muse.StyleTrainer, asm: Unity.Muse.StyleTrainer}
+      data:
+        m_Guid: b559ad23-69e9-4974-9740-1e44a4ca5e73
+        m_State: 1
+        m_Disposing: 1
+    - rid: 1138254439193247869
+      type: {class: ImageArtifact, ns: Unity.Muse.StyleTrainer, asm: Unity.Muse.StyleTrainer}
+      data:
+        m_Guid: 24117f91-889d-455c-9ed2-21451795fc74
+        m_State: 1
+        m_Disposing: 1
+    - rid: 1138254439193247870
+      type: {class: ImageArtifact, ns: Unity.Muse.StyleTrainer, asm: Unity.Muse.StyleTrainer}
+      data:
+        m_Guid: 00000000-0000-0000-0000-000000000000
+        m_State: 3
+        m_Disposing: 1
+    - rid: 1138254439193247871
+      type: {class: ImageArtifact, ns: Unity.Muse.StyleTrainer, asm: Unity.Muse.StyleTrainer}
+      data:
+        m_Guid: 334f172b-d032-4cb6-b803-ff6200998632
+        m_State: 1
+        m_Disposing: 1
+    - rid: 1138254439193247872
+      type: {class: ImageArtifact, ns: Unity.Muse.StyleTrainer, asm: Unity.Muse.StyleTrainer}
+      data:
+        m_Guid: 928f2d51-924f-4853-a079-c0aed9da0837
+        m_State: 1
+        m_Disposing: 1
+    - rid: 1138254439193247873
+      type: {class: ImageArtifact, ns: Unity.Muse.StyleTrainer, asm: Unity.Muse.StyleTrainer}
+      data:
+        m_Guid: d86127d7-4615-42c5-a75a-6ffb56ec8e27
+        m_State: 1
+        m_Disposing: 1
+    - rid: 1138254439193247874
+      type: {class: ImageArtifact, ns: Unity.Muse.StyleTrainer, asm: Unity.Muse.StyleTrainer}
+      data:
+        m_Guid: 201bd52e-06d9-45fd-b0ae-4cffe8763fe6
+        m_State: 1
+        m_Disposing: 1
+    - rid: 1138254439193247875
+      type: {class: ImageArtifact, ns: Unity.Muse.StyleTrainer, asm: Unity.Muse.StyleTrainer}
+      data:
+        m_Guid: ec4f761c-c979-4586-8ef6-97f3f3d16852
+        m_State: 1
+        m_Disposing: 1
+    - rid: 1138254448702259367
+      type: {class: StyleData, ns: Unity.Muse.StyleTrainer, asm: Unity.Muse.StyleTrainer}
+      data:
+        m_Guid: 5cc104e0-423a-473e-8034-b9d346cb2357
+        m_State: 1
+        m_Disposing: 0
+        m_IsFallback: 0
+        m_Thumbnail:
+          rid: -2
+        m_Visible: 1
+        selectedCheckPointGUID: 00000000-0000-0000-0000-000000000000
+        m_FavoriteCheckPointGUID: active
+        parentID: 00000000-0000-0000-0000-000000000000
+        m_ProjectID: 11000000-0000-0000-0000-000000000011
+        m_TrainingSteps: 2000
+        m_CheckPoints:
+        - m_Guid: 03fa404b-39fc-4979-9272-deb5d8c4b24c
+          m_State: 1
+          m_Disposing: 0
+          m_ProjectID: 11000000-0000-0000-0000-000000000011
+          m_Name: 'Happy Harvest [Orion V4 2000]'
+          m_Description: 8 Nov 2023
+          parent_id: 00000000-0000-0000-0000-000000000000
+          m_TrainingSetData:
+            m_Guid: 3e758588-960f-44f5-865a-d5eaa1b1dec4
+            m_State: 5
+            m_Disposing: 0
+            m_TrainingSet: []
+            m_ProjectID: 11000000-0000-0000-0000-000000000011
+          m_ValidationImagesData:
+          - m_Guid: 96b39a19-2d3e-4bc5-aa3c-38667ed6eba5
+            m_State: 5
+            m_Disposing: 0
+            m_ImageArtifact:
+              m_Guid: 96b39a19-2d3e-4bc5-aa3c-38667ed6eba5
+              m_State: 5
+              m_Disposing: 0
+            m_Prompt: A chicken
+          - m_Guid: 05de072c-ebbc-43d7-886b-7ac4f9cbd079
+            m_State: 5
+            m_Disposing: 0
+            m_ImageArtifact:
+              m_Guid: 05de072c-ebbc-43d7-886b-7ac4f9cbd079
+              m_State: 5
+              m_Disposing: 0
+            m_Prompt: A cow
+          - m_Guid: 2dbfc212-f87b-45f9-a05a-06368e190ca1
+            m_State: 5
+            m_Disposing: 0
+            m_ImageArtifact:
+              m_Guid: 2dbfc212-f87b-45f9-a05a-06368e190ca1
+              m_State: 5
+              m_Disposing: 0
+            m_Prompt: A dog
+          - m_Guid: e0139464-a868-402a-95b8-b4c26685a97b
+            m_State: 5
+            m_Disposing: 0
+            m_ImageArtifact:
+              m_Guid: e0139464-a868-402a-95b8-b4c26685a97b
+              m_State: 5
+              m_Disposing: 0
+            m_Prompt: A farmer
+          - m_Guid: 4421bead-a3ff-4c09-9514-61e127eb470e
+            m_State: 5
+            m_Disposing: 0
+            m_ImageArtifact:
+              m_Guid: 4421bead-a3ff-4c09-9514-61e127eb470e
+              m_State: 5
+              m_Disposing: 0
+            m_Prompt: A pine tree
+          m_FavoriteSampleOutputDataGuid: 
+          m_TrainingSteps: 1200
+        m_SampleOutputPrompts:
+        - A chicken
+        - A cow
+        - A dog
+        - A farmer
+        - A pine tree
+        m_TrainingSetData:
+        - m_Guid: 3e758588-960f-44f5-865a-d5eaa1b1dec4
+          m_State: 5
+          m_Disposing: 0
+          m_TrainingSet: []
+          m_ProjectID: 11000000-0000-0000-0000-000000000011
+        m_Name: Default
+        m_Description: Default Style
