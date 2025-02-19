@@ -2,14 +2,16 @@ using TMPro;
 using UnityEngine;
 using System.Collections.Generic;
 using Unity.Notifications.Android;
+using UnityEngine.SceneManagement;
 
 public class SimpleTimer : MonoBehaviour
 {
+
     public TMP_Text timerText;
     public GameObject egg; // Reference to the egg
     public GameObject Disc;
     public GameObject Disc2;
-    
+    public GameObject unlockPopup;
     // Reference to the button's label that will toggle between "Start Timer" and "Give Up"
     public TMP_Text timerButtonLabel; 
 
@@ -31,7 +33,7 @@ public class SimpleTimer : MonoBehaviour
     
     if (circularTimer != null)
     {
-        circularTimer.currentMinutes = 10;  // Ensure the circular timer starts at 1 minute
+        circularTimer.currentMinutes = 0;  // Ensure the circular timer starts at 1 minute
     }
 
     }
@@ -100,25 +102,33 @@ public class SimpleTimer : MonoBehaviour
         }
     }
 
-    void SpawnRandomAnimal()
+void SpawnRandomAnimal()
+{
+    if (animalPrefabs.Count > 0 && spawnPoint != null)
     {
-        if (animalPrefabs.Count > 0 && spawnPoint != null)
-        {
-            int randomIndex = Random.Range(0, animalPrefabs.Count);
-            GameObject newAnimal = Instantiate(animalPrefabs[randomIndex], spawnPoint.position, Quaternion.identity);
-            
-            // Rename to remove "(Clone)" from the instantiated prefab name.
-            newAnimal.name = animalPrefabs[randomIndex].name;
-            Debug.Log($"Spawned: {newAnimal.name}");
+        int randomIndex = Random.Range(0, animalPrefabs.Count);
+        GameObject newAnimal = Instantiate(animalPrefabs[randomIndex], spawnPoint.position, Quaternion.identity);
+        
+        // Rename to remove "(Clone)" from the instantiated prefab name.
+        newAnimal.name = animalPrefabs[randomIndex].name;
+        Debug.Log($"Spawned: {newAnimal.name}");
 
-            // Save the unlocked animal.
-            UnlockAnimal(newAnimal.name);
-        }
-        else
-        {
-            Debug.LogError("No animal prefabs assigned or spawn point missing!");
-        }
+        // Save the unlocked animal.
+        UnlockAnimal(newAnimal.name);
+
+        // Mark this animal as pending placement in the Zoo scene.
+        PlayerPrefs.SetString("PendingAnimal", newAnimal.name);
+        PlayerPrefs.Save();
     }
+    else
+    {
+        Debug.LogError("No animal prefabs assigned or spawn point missing!");
+    }
+    unlockPopup.SetActive(true);
+}
+
+
+
 
     void UnlockAnimal(string animalName)
     {
@@ -146,6 +156,10 @@ public class SimpleTimer : MonoBehaviour
             Destroy(egg);
             Debug.Log("Egg destroyed by Give Up action.");
         }
+    }
+    public void AddToZoo()
+    {
+     SceneManager.LoadScene("Zoo");   
     }
 
     void OnApplicationFocus(bool hasFocus)
