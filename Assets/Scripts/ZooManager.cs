@@ -4,8 +4,8 @@ using System.Collections.Generic;
 [System.Serializable]
 public class AnimalEntry
 {
-    public string animalName;      // The name used to identify the animal (must match saved name)
-    public GameObject animalPrefab; // The prefab to instantiate
+    public string animalName;
+    public GameObject animalPrefab;
 }
 
 public class ZooManager : MonoBehaviour
@@ -14,15 +14,15 @@ public class ZooManager : MonoBehaviour
     [Tooltip("List all possible animals with their corresponding prefabs.")]
     public List<AnimalEntry> allAnimals;
 
-    [Header("Layout Settings")]
+    [Header("Enclosure Settings")]
     [Tooltip("Parent object to hold animal instances.")]
     public Transform animalParent;
-    [Tooltip("Starting position for the grid layout.")]
-    public Vector2 startPosition = new Vector2(-3f, 3f);
-    [Tooltip("Horizontal and vertical spacing between animals.")]
-    public Vector2 gridSpacing = new Vector2(3f, 3f);
-    [Tooltip("Number of animals per row.")]
-    public int animalsPerRow = 3;
+    [Tooltip("Size of the enclosure (width & height).")]
+    public Vector2 enclosureSize = new Vector2(10f, 10f);
+    [Tooltip("Minimum distance between animals to prevent overlap.")]
+    public float minDistanceBetweenAnimals = 1.5f;
+    
+    private List<Vector2> usedPositions = new List<Vector2>(); // Track used positions
 
     void Start()
     {
@@ -31,7 +31,6 @@ public class ZooManager : MonoBehaviour
 
     void DisplayUnlockedAnimals()
     {
-        // Retrieve the comma-separated list of unlocked animal names from PlayerPrefs
         string unlockedAnimals = PlayerPrefs.GetString("UnlockedAnimals", "");
         if (string.IsNullOrEmpty(unlockedAnimals))
         {
@@ -39,31 +38,61 @@ public class ZooManager : MonoBehaviour
             return;
         }
 
-        // Split the string by commas (ignoring empty entries)
         string[] animalNames = unlockedAnimals.Split(new char[] { ',' }, System.StringSplitOptions.RemoveEmptyEntries);
         
-        int index = 0;
         foreach (string name in animalNames)
         {
-            // Find the corresponding AnimalEntry from the list
             AnimalEntry entry = allAnimals.Find(x => x.animalName == name);
             if (entry != null && entry.animalPrefab != null)
             {
-                // Calculate grid position based on index
-                int row = index / animalsPerRow;
-                int col = index % animalsPerRow;
-                Vector2 position = startPosition + new Vector2(col * gridSpacing.x, -row * gridSpacing.y);
-
-                // Instantiate the animal prefab at the calculated position
-                GameObject animalInstance = Instantiate(entry.animalPrefab, position, Quaternion.identity, animalParent);
-                animalInstance.name = entry.animalName; // Optional: rename the instance
-
-                index++;
+                // Find a valid random position inside the enclosure
+                Vector2 spawnPosition = GetValidPosition();
+                
+                // Instantiate the animal at the position
+                GameObject animalInstance = Instantiate(entry.animalPrefab, new Vector3(spawnPosition.x, 0, spawnPosition.y), Quaternion.Euler(0, Random.Range(0, 360), 0), animalParent);
+                
+                animalInstance.name = entry.animalName; // Rename instance
             }
             else
             {
                 Debug.LogWarning($"No prefab found for animal: {name}");
             }
         }
+    }
+
+    Vector2 GetValidPosition()
+    {
+        Vector2 randomPosition;
+        int attempts = 0;
+        
+        do
+        {
+            // Random position inside the enclosure
+            randomPosition = new Vector2(
+                Random.Range(-enclosureSize.x / 2, enclosureSize.x / 2),
+                Random.Range(-enclosureSize.y / 2, enclosureSize.y / 2)
+            );
+
+            attempts++;
+
+            // Prevent infinite loops (failsafe)
+            if (attempts > 50) break;
+        }
+        while (IsPositionTooClose(randomPosition));
+
+        usedPositions.Add(randomPosition); // Save used position
+        return randomPosition;
+    }
+
+    bool IsPositionTooClose(Vector2 newPosition)
+    {
+        foreach (Vector2 pos in usedPositions)
+        {
+            if (Vector2.Distance(newPosition, pos) < minDistanceBetweenAnimals)
+            {
+                return true; // Too close, pick another position
+            }
+        }
+        return false;
     }
 }

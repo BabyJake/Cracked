@@ -588,6 +588,7 @@ MonoBehaviour:
   egg: {fileID: 787029546}
   Disc: {fileID: 418442508}
   Disc2: {fileID: 918792542}
+  timerButtonLabel: {fileID: 1473607517}
   animalPrefabs:
   - {fileID: 1943816423111845045, guid: 2816340e3a19ff044afa520351032dca, type: 3}
   - {fileID: 689278716372589056, guid: 1675ea02cc206cb41a2edd929eed8806, type: 3}
@@ -2403,7 +2404,7 @@ MonoBehaviour:
       m_Calls:
       - m_Target: {fileID: 488926799}
         m_TargetAssemblyTypeName: SimpleTimer, Assembly-CSharp
-        m_MethodName: StartTimer
+        m_MethodName: OnTimerButtonPressed
         m_Mode: 1
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
