@@ -159,7 +159,7 @@ void SpawnRandomAnimal()
     }
     public void AddToZoo()
     {
-     SceneManager.LoadScene("Zoo");   
+     SceneManager.LoadScene("Sanctuary");   
     }
 
     void OnApplicationFocus(bool hasFocus)
