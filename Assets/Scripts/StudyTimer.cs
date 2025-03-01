@@ -6,50 +6,61 @@ using UnityEngine.SceneManagement;
 
 public class SimpleTimer : MonoBehaviour
 {
-
     public TMP_Text timerText;
-    public GameObject egg; // Reference to the egg
+    public GameObject eggPrefab; // Assign the egg prefab in the Inspector
     public GameObject Disc;
     public GameObject Disc2;
     public GameObject unlockPopup;
-    // Reference to the button's label that will toggle between "Start Timer" and "Give Up"
     public TMP_Text timerButtonLabel; 
 
     private float timeRemaining;
     private bool isTimerRunning;
     private bool sessionFailed = false;
 
-    public List<GameObject> animalPrefabs; // List of animal prefabs (Assign in Inspector)
-    public Transform spawnPoint; // Spawn location for the animal
+    public List<GameObject> animalPrefabs; // Assign animal prefabs in Inspector
+    public Transform spawnPoint; // Spawn location for the egg
+    private GameObject currentEgg; // Store the instantiated egg
 
-    // Reference to the radial slider script that holds the current time value.
-    public CircularTimer circularTimer;  // Assign this in the Inspector
+    public CircularTimer circularTimer;
 
     void Start()
     {
         sessionFailed = false;
-        // Set initial button text.
         timerButtonLabel.text = "Start Timer";
-    
-    if (circularTimer != null)
+
+        if (circularTimer != null)
+        {
+            circularTimer.currentMinutes = 0;
+        }
+
+        // Spawn the egg at the start of the game
+        SpawnEgg();
+    }
+
+    void SpawnEgg()
     {
-        circularTimer.currentMinutes = 0;  // Ensure the circular timer starts at 1 minute
+        Vector3 eggPosition = new Vector3(0f, -2.316304f, 0f); // Set your desired X, Y, Z coordinates
+        if (eggPrefab != null)
+        {
+            currentEgg = Instantiate(eggPrefab, eggPosition, Quaternion.identity);
+            Debug.Log("Egg spawned at: " + eggPosition);
+        }
+        else
+        {
+            Debug.LogError("Egg prefab is not assigned!");
+        }
     }
 
-    }
 
-    // This method should be hooked up to your button's OnClick event.
     public void OnTimerButtonPressed()
     {
         if (!isTimerRunning)
         {
-            // If timer is not running, start it.
             StartTimer();
             timerButtonLabel.text = "Give Up";
         }
         else
         {
-            // If timer is running, the button now means "Give Up"
             GiveUp();
             timerButtonLabel.text = "Start Timer";
         }
@@ -57,7 +68,6 @@ public class SimpleTimer : MonoBehaviour
 
     public void StartTimer()
     {
-        // Use the value from the radial slider.
         float minutes = circularTimer.currentMinutes;
         timeRemaining = minutes * 60;
         isTimerRunning = true;
@@ -79,7 +89,6 @@ public class SimpleTimer : MonoBehaviour
                 timeRemaining = 0;
                 Debug.Log("Timer complete! Egg hatched!");
                 HatchEgg();
-                // Reset the button text once the timer finishes.
                 timerButtonLabel.text = "Start Timer";
             }
         }
@@ -94,41 +103,33 @@ public class SimpleTimer : MonoBehaviour
 
     void HatchEgg()
     {
-        if (egg != null)
+        if (currentEgg != null)
         {
-            Destroy(egg);
+            Destroy(currentEgg);
             Debug.Log("Egg hatched! You earned a new animal.");
             SpawnRandomAnimal();
         }
     }
 
-void SpawnRandomAnimal()
-{
-    if (animalPrefabs.Count > 0 && spawnPoint != null)
+    void SpawnRandomAnimal()
     {
-        int randomIndex = Random.Range(0, animalPrefabs.Count);
-        GameObject newAnimal = Instantiate(animalPrefabs[randomIndex], spawnPoint.position, Quaternion.identity);
-        
-        // Rename to remove "(Clone)" from the instantiated prefab name.
-        newAnimal.name = animalPrefabs[randomIndex].name;
-        Debug.Log($"Spawned: {newAnimal.name}");
+        if (animalPrefabs.Count > 0 && spawnPoint != null)
+        {
+            int randomIndex = Random.Range(0, animalPrefabs.Count);
+            GameObject newAnimal = Instantiate(animalPrefabs[randomIndex], spawnPoint.position, Quaternion.identity);
+            newAnimal.name = animalPrefabs[randomIndex].name;
+            Debug.Log($"Spawned: {newAnimal.name}");
 
-        // Save the unlocked animal.
-        UnlockAnimal(newAnimal.name);
-
-        // Mark this animal as pending placement in the Zoo scene.
-        PlayerPrefs.SetString("PendingAnimal", newAnimal.name);
-        PlayerPrefs.Save();
+            UnlockAnimal(newAnimal.name);
+            PlayerPrefs.SetString("PendingAnimal", newAnimal.name);
+            PlayerPrefs.Save();
+        }
+        else
+        {
+            Debug.LogError("No animal prefabs assigned or spawn point missing!");
+        }
+        unlockPopup.SetActive(true);
     }
-    else
-    {
-        Debug.LogError("No animal prefabs assigned or spawn point missing!");
-    }
-    unlockPopup.SetActive(true);
-}
-
-
-
 
     void UnlockAnimal(string animalName)
     {
@@ -146,20 +147,20 @@ void SpawnRandomAnimal()
         }
     }
 
-    // This method is called when the user gives up (by pressing the button while timer is running)
     public void GiveUp()
     {
         isTimerRunning = false;
         timeRemaining = 0;
-        if (egg != null)
+        if (currentEgg != null)
         {
-            Destroy(egg);
+            Destroy(currentEgg);
             Debug.Log("Egg destroyed by Give Up action.");
         }
     }
+
     public void AddToZoo()
     {
-     SceneManager.LoadScene("Sanctuary");   
+        SceneManager.LoadScene("Sanctuary");
     }
 
     void OnApplicationFocus(bool hasFocus)
@@ -176,7 +177,7 @@ void SpawnRandomAnimal()
     {
         isTimerRunning = false;
         timeRemaining = 0;
-        if (egg != null) Destroy(egg);
+        if (currentEgg != null) Destroy(currentEgg);
         Debug.Log("Egg destroyed due to distraction!");
     }
 }
