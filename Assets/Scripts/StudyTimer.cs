@@ -1,25 +1,32 @@
-using TMPro;
 using UnityEngine;
 using System.Collections.Generic;
 using Unity.Notifications.Android;
 using UnityEngine.SceneManagement;
+using UnityEngine.UI;
+using TMPro;
 
 public class SimpleTimer : MonoBehaviour
 {
     public TMP_Text timerText;
-    public GameObject eggPrefab; // Assign the egg prefab in the Inspector
+    public GameObject eggPrefab;
     public GameObject Disc;
     public GameObject Disc2;
     public GameObject unlockPopup;
-    public TMP_Text timerButtonLabel; 
+    public TMP_Text timerButtonLabel;
+    public GameObject menu;
+
+    public GameObject giveUpPopup;
+    public Button yesButton;
+    public Button noButton;
 
     private float timeRemaining;
     private bool isTimerRunning;
     private bool sessionFailed = false;
 
-    public List<GameObject> animalPrefabs; // Assign animal prefabs in Inspector
-    public Transform spawnPoint; // Spawn location for the egg
-    private GameObject currentEgg; // Store the instantiated egg
+    public List<GameObject> animalPrefabs;
+    public Transform spawnPoint;
+    private GameObject currentEgg;
+    private GameObject currentAnimal; // New field to track the spawned animal
 
     public CircularTimer circularTimer;
 
@@ -33,13 +40,16 @@ public class SimpleTimer : MonoBehaviour
             circularTimer.currentMinutes = 0;
         }
 
-        // Spawn the egg at the start of the game
         SpawnEgg();
+
+        if (giveUpPopup != null) giveUpPopup.SetActive(false);
+        if (yesButton != null) yesButton.onClick.AddListener(OnYesClicked);
+        if (noButton != null) noButton.onClick.AddListener(OnNoClicked);
     }
 
     void SpawnEgg()
     {
-        Vector3 eggPosition = new Vector3(0f, -2.316304f, 0f); // Set your desired X, Y, Z coordinates
+        Vector3 eggPosition = new Vector3(0f, -2.316304f, 0f);
         if (eggPrefab != null)
         {
             currentEgg = Instantiate(eggPrefab, eggPosition, Quaternion.identity);
@@ -51,7 +61,6 @@ public class SimpleTimer : MonoBehaviour
         }
     }
 
-
     public void OnTimerButtonPressed()
     {
         if (!isTimerRunning)
@@ -61,8 +70,10 @@ public class SimpleTimer : MonoBehaviour
         }
         else
         {
-            GiveUp();
-            timerButtonLabel.text = "Start Timer";
+            if (giveUpPopup != null && isTimerRunning)
+            {
+                giveUpPopup.SetActive(true);
+            }
         }
     }
 
@@ -74,6 +85,7 @@ public class SimpleTimer : MonoBehaviour
         sessionFailed = false;
         Disc2.SetActive(false);
         Disc.SetActive(false);
+        menu.SetActive(false);
     }
 
     void Update()
@@ -116,12 +128,12 @@ public class SimpleTimer : MonoBehaviour
         if (animalPrefabs.Count > 0 && spawnPoint != null)
         {
             int randomIndex = Random.Range(0, animalPrefabs.Count);
-            GameObject newAnimal = Instantiate(animalPrefabs[randomIndex], spawnPoint.position, Quaternion.identity);
-            newAnimal.name = animalPrefabs[randomIndex].name;
-            Debug.Log($"Spawned: {newAnimal.name}");
+            currentAnimal = Instantiate(animalPrefabs[randomIndex], spawnPoint.position, Quaternion.identity); // Store the reference
+            currentAnimal.name = animalPrefabs[randomIndex].name;
+            Debug.Log($"Spawned: {currentAnimal.name}");
 
-            UnlockAnimal(newAnimal.name);
-            PlayerPrefs.SetString("PendingAnimal", newAnimal.name);
+            UnlockAnimal(currentAnimal.name);
+            PlayerPrefs.SetString("PendingAnimal", currentAnimal.name);
             PlayerPrefs.Save();
         }
         else
@@ -156,6 +168,55 @@ public class SimpleTimer : MonoBehaviour
             Destroy(currentEgg);
             Debug.Log("Egg destroyed by Give Up action.");
         }
+        timerButtonLabel.text = "Start Timer";
+    }
+
+    public void ResetAll()
+    {
+        isTimerRunning = false;
+        timeRemaining = 0;
+
+        if (circularTimer != null)
+        {
+            circularTimer.currentMinutes = 0;
+            circularTimer.dialImage.fillAmount = 0f;
+            circularTimer.UpdateKnobPosition();
+            circularTimer.UpdateTimeText();
+        }
+
+        if (currentEgg != null)
+        {
+            Destroy(currentEgg);
+            Debug.Log("Egg destroyed by Reset action.");
+        }
+
+        if (currentAnimal != null) // Destroy the spawned animal if it exists
+        {
+            Destroy(currentAnimal);
+            Debug.Log("Animal despawned by Reset action.");
+            currentAnimal = null; // Clear the reference
+        }
+
+        SpawnEgg();
+
+        timerButtonLabel.text = "Start Timer";
+        Disc.SetActive(true);
+        Disc2.SetActive(true);
+        unlockPopup.SetActive(false);
+        menu.SetActive(true); // Show menu again, assuming it's visible at start
+
+        UpdateTimerDisplay();
+    }
+
+    public void OnYesClicked()
+    {
+        ResetAll();
+        if (giveUpPopup != null) giveUpPopup.SetActive(false);
+    }
+
+    public void OnNoClicked()
+    {
+        if (giveUpPopup != null) giveUpPopup.SetActive(false);
     }
 
     public void AddToZoo()
@@ -179,5 +240,11 @@ public class SimpleTimer : MonoBehaviour
         timeRemaining = 0;
         if (currentEgg != null) Destroy(currentEgg);
         Debug.Log("Egg destroyed due to distraction!");
+    }
+
+    void OnDestroy()
+    {
+        if (yesButton != null) yesButton.onClick.RemoveListener(OnYesClicked);
+        if (noButton != null) noButton.onClick.RemoveListener(OnNoClicked);
     }
 }

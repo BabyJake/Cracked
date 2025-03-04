@@ -54,7 +54,7 @@ public class CircularTimer : MonoBehaviour, IPointerDownHandler, IDragHandler, I
     }
 
     // Update the dial fill amount based on the pointer position
-    private void UpdateDial(PointerEventData eventData)
+    public void UpdateDial(PointerEventData eventData)
     {
         Vector2 localPoint;
         // Convert the pointer's screen position to a local position within the dial's RectTransform.
@@ -95,7 +95,7 @@ public class CircularTimer : MonoBehaviour, IPointerDownHandler, IDragHandler, I
     }
 
     // Update the knob position based on current fill amount
-    private void UpdateKnobPosition()
+    public void UpdateKnobPosition()
     {
         if (knob != null)
         {
@@ -122,7 +122,7 @@ public class CircularTimer : MonoBehaviour, IPointerDownHandler, IDragHandler, I
     }
 
     // Update the displayed time (formatted as mm:ss)
-    private void UpdateTimeText()
+    public void UpdateTimeText()
     {
         int minutes = Mathf.FloorToInt(currentMinutes);
         int seconds = Mathf.FloorToInt((currentMinutes - minutes) * 60);

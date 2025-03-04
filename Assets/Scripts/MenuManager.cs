@@ -3,12 +3,18 @@ using UnityEngine.UI;
 using UnityEngine.SceneManagement;
 using UnityEngine.EventSystems;
 using System.Collections.Generic;
+using DG.Tweening;
 
 public class MenuManager : MonoBehaviour
 {
     [Header("References")]
     public GameObject menuPanel; // The sliding menu panel
     public Button menuButton;    // Button to open the menu
+    [SerializeField] RectTransform PauseMenurect;
+    [SerializeField] float topPosX, middlePosX;
+    [SerializeField] float tweenDuration;
+    public MenuSlide menuSlide;
+
 
     void Start()
     {
@@ -30,19 +36,34 @@ public class MenuManager : MonoBehaviour
     public void OpenMenu()
     {
         menuPanel.SetActive(true);
+        menuSlide.SlideIn();
     }
 
     public void CloseMenu()
     {
-        menuPanel.SetActive(false);
+        // Call SlideOut and use OnComplete to deactivate the panel after animation finishes
+        menuSlide.SlideOut().OnComplete(() => {
+            menuPanel.SetActive(false);
+        });
     }
 
+    void PausePanelIntro()
+    {
+        PauseMenurect.DOAnchorPosX(middlePosX, tweenDuration);
+    }
+    
+    void PausePanelOutro()
+    {
+        PauseMenurect.DOAnchorPosX(topPosX, tweenDuration);
+    }
+    
     public void LoadZooScene()
     {
         SceneManager.LoadScene("Zoo");
     }
-
-
+    public void LoadHome(){
+        SceneManager.LoadScene("Menu");    
+    }
 
     private bool IsTouchOrClickOutsideMenu()
     {
@@ -79,5 +100,4 @@ public class MenuManager : MonoBehaviour
         }
         return false;
     }
-    
 }
