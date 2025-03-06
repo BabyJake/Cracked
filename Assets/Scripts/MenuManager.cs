@@ -14,12 +14,14 @@ public class MenuManager : MonoBehaviour
     [SerializeField] float topPosX, middlePosX;
     [SerializeField] float tweenDuration;
     public MenuSlide menuSlide;
+    public GameObject Blackout;
 
 
     void Start()
     {
         menuPanel.SetActive(false);
         menuButton.onClick.AddListener(OpenMenu);
+        Blackout.SetActive(false);
     }
 
     void Update()
@@ -37,13 +39,16 @@ public class MenuManager : MonoBehaviour
     {
         menuPanel.SetActive(true);
         menuSlide.SlideIn();
+        Blackout.SetActive(true);
     }
 
     public void CloseMenu()
     {
+        Blackout.SetActive(false);
         // Call SlideOut and use OnComplete to deactivate the panel after animation finishes
         menuSlide.SlideOut().OnComplete(() => {
             menuPanel.SetActive(false);
+            
         });
     }
 
