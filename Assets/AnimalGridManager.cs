@@ -22,6 +22,9 @@ public class AnimalGridManager : MonoBehaviour
     public Button weeklyButton;
     public Button yearlyButton;
 
+    [Header("Isometric Settings")]
+    public float animalYOffset = 0.1f; // Offset to make animals appear on top of tiles
+
     private int gridSize = 3;
     private const string PendingAnimalKey = "PendingAnimal";
     private HatchData hatchData;
@@ -51,6 +54,12 @@ public class AnimalGridManager : MonoBehaviour
 
     void Start()
     {
+        // Ensure the grid is set to isometric layout
+        if (tilemap.layoutGrid != null)
+        {
+            tilemap.layoutGrid.cellLayout = GridLayout.CellLayout.Isometric;
+        }
+        
         hatchData = LoadHatchData();
         FillGrid();
         string pendingAnimal = PlayerPrefs.GetString(PendingAnimalKey, "");
@@ -117,13 +126,33 @@ public class AnimalGridManager : MonoBehaviour
         }
         
         placedPosition = emptyCells[UnityEngine.Random.Range(0, emptyCells.Count)];
+        
+        // Get the world position from the tilemap for isometric grid
         Vector3 worldPos = tilemap.GetCellCenterWorld(placedPosition);
-
+        
+        // Add a Y offset to make sure the animal appears to stand on the tile
+        worldPos.y += animalYOffset;
+        
         GameObject animalPrefab = GetAnimalPrefabByName(animalName);
         if (animalPrefab != null)
         {
             spawnedAnimal = Instantiate(animalPrefab, worldPos, Quaternion.identity, animalParent);
             spawnedAnimal.name = animalPrefab.name;
+            
+            // Set the sorting order based on y-position to maintain proper depth
+            SpriteRenderer renderer = spawnedAnimal.GetComponent<SpriteRenderer>();
+            if (renderer != null)
+            {
+                // Higher grid position Y = further back = lower sorting order
+                renderer.sortingOrder = -placedPosition.y;
+            }
+            
+            // Add isometric sorting component if it doesn't exist
+            if (spawnedAnimal.GetComponent<IsometricSorting>() == null)
+            {
+                spawnedAnimal.AddComponent<IsometricSorting>();
+            }
+            
             return true;
         }
         return false;
@@ -321,5 +350,32 @@ public class AnimalGridManager : MonoBehaviour
         SaveHatchData();
         UpdateHatchCountUI();
         UpdateGridVisibility();
+    }
+}
+
+// Add this component to handle isometric sorting
+public class IsometricSorting : MonoBehaviour
+{
+    private SpriteRenderer spriteRenderer;
+    
+    void Start()
+    {
+        spriteRenderer = GetComponent<SpriteRenderer>();
+        UpdateSortingOrder();
+    }
+    
+    void Update()
+    {
+        UpdateSortingOrder();
+    }
+    
+    void UpdateSortingOrder()
+    {
+        if (spriteRenderer != null)
+        {
+            // The higher the y-coordinate in world space, the further back the object should appear
+            // Multiply by -100 to get more precision and avoid sorting conflicts
+            spriteRenderer.sortingOrder = Mathf.RoundToInt(-transform.position.y * 100);
+        }
     }
 }
