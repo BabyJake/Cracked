@@ -3,27 +3,42 @@ using UnityEngine;
 
 public class MenuSlide : MonoBehaviour
 {
-    // Reference to your menu's RectTransform
     [SerializeField] private RectTransform menuPanel;
-    
-    // Duration of the animation in seconds
     [SerializeField] private float animationDuration = 0.5f;
-    
+    [SerializeField] private float offScreenX = -216f;  // Configurable off-screen position
+    [SerializeField] private float onScreenX = 133.8f;  // Configurable on-screen position
+
+    private Tween activeTween;  // Track the current tween
+
     private void Start()
     {
-        // Optional: Set initial position
-        menuPanel.anchoredPosition = new Vector2(-216f, menuPanel.anchoredPosition.y);
+        // Ensure the menu starts off-screen
+        menuPanel.anchoredPosition = new Vector2(offScreenX, menuPanel.anchoredPosition.y);
     }
-    
-    // Call this to slide the menu in
+
     public Tween SlideIn()
     {
-        return menuPanel.DOAnchorPosX(133.8f, animationDuration).SetEase(Ease.OutQuad);
+        // Kill any existing tween to avoid overlap
+        activeTween?.Kill();
+        activeTween = menuPanel.DOAnchorPosX(onScreenX, animationDuration)
+            .SetEase(Ease.OutQuad)
+            .SetUpdate(true);  // Ensures animation runs even when paused
+        return activeTween;
     }
-    
-    // Call this to slide the menu out
+
     public Tween SlideOut()
     {
-        return menuPanel.DOAnchorPosX(-216f, animationDuration).SetEase(Ease.InQuad);
+        activeTween?.Kill();
+        activeTween = menuPanel.DOAnchorPosX(offScreenX, animationDuration)
+            .SetEase(Ease.InQuad)
+            .SetUpdate(true);
+        return activeTween;
+    }
+
+    // Optional: Instantly reset to off-screen position (e.g., for initialization)
+    public void ResetPosition()
+    {
+        activeTween?.Kill();
+        menuPanel.anchoredPosition = new Vector2(offScreenX, menuPanel.anchoredPosition.y);
     }
 }

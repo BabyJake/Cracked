@@ -60,6 +60,12 @@ public class AnimalGridManager : MonoBehaviour
             PlayerPrefs.DeleteKey(PendingAnimalKey);
             PlayerPrefs.Save();
         }
+
+        // Add test animals with specific dates for debugging
+        DebugHatchAnimal("Cow", "2025-03-08"); // Today (visible in Week view)
+        DebugHatchAnimal("Sheep", "2025-03-02"); // 6 days ago (visible in Week view)
+        DebugHatchAnimal("Pig", "2025-02-28"); // 8 days ago (should NOT be visible in Week view)
+
         UpdateHatchCountUI();
         UpdateGridVisibility();
 
@@ -110,7 +116,7 @@ public class AnimalGridManager : MonoBehaviour
             return false;
         }
         
-        placedPosition = emptyCells[UnityEngine.Random.Range(0, emptyCells.Count)]; // Fixed ambiguity
+        placedPosition = emptyCells[UnityEngine.Random.Range(0, emptyCells.Count)];
         Vector3 worldPos = tilemap.GetCellCenterWorld(placedPosition);
 
         GameObject animalPrefab = GetAnimalPrefabByName(animalName);
@@ -169,6 +175,11 @@ public class AnimalGridManager : MonoBehaviour
             }
         }
         return null;
+    }
+
+    private void DateChecker()
+    {
+        
     }
 
     private void RecordHatching()
@@ -273,6 +284,7 @@ public class AnimalGridManager : MonoBehaviour
                     break;
             }
             instance.animalObject.SetActive(shouldBeVisible);
+            Debug.Log($"{instance.animalObject.name} hatched on {instance.hatchDate} - Visible: {shouldBeVisible}");
         }
     }
 
@@ -281,5 +293,33 @@ public class AnimalGridManager : MonoBehaviour
         currentView = view;
         UpdateGridVisibility();
         UpdateHatchCountUI();
+    }
+
+    // Debug method for testing with custom hatch dates
+    public void DebugHatchAnimal(string animalName, string customHatchDate)
+    {
+        bool placed = PlaceAnimalOnRandomCell(animalName, out Vector3Int placedPosition, out GameObject spawnedAnimal);
+        while (!placed)
+        {
+            ExpandGrid();
+            FillGrid();
+            placed = PlaceAnimalOnRandomCell(animalName, out placedPosition, out spawnedAnimal);
+        }
+        // Use custom date instead of today's date
+        animalInstances.Add(new AnimalInstance { animalObject = spawnedAnimal, gridPosition = placedPosition, hatchDate = customHatchDate });
+        
+        // Simulate recording the hatch in HatchData
+        DailyHatchCount count = hatchData.counts.Find(c => c.date == customHatchDate);
+        if (count != null)
+        {
+            count.count++;
+        }
+        else
+        {
+            hatchData.counts.Add(new DailyHatchCount { date = customHatchDate, count = 1 });
+        }
+        SaveHatchData();
+        UpdateHatchCountUI();
+        UpdateGridVisibility();
     }
 }
