@@ -64,7 +64,7 @@ public class MenuManager : MonoBehaviour
     
     public void LoadZooScene()
     {
-        SceneManager.LoadScene("Zoo");
+        SceneManager.LoadScene("Sanctuary");
     }
     public void LoadHome(){
         SceneManager.LoadScene("Menu");    

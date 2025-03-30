@@ -1,6 +1,5 @@
 using UnityEngine;
 using System.Collections.Generic;
-using Unity.Notifications.Android;
 using UnityEngine.SceneManagement;
 using UnityEngine.UI;
 using TMPro;
@@ -14,6 +13,7 @@ public class SimpleTimer : MonoBehaviour
     public GameObject unlockPopup;
     public TMP_Text timerButtonLabel;
     public GameObject menu;
+    public GameObject eggMenu;
 
     public GameObject giveUpPopup;
     public Button yesButton;
@@ -22,11 +22,13 @@ public class SimpleTimer : MonoBehaviour
     private float timeRemaining;
     private bool isTimerRunning;
     private bool sessionFailed = false;
+    private bool isProcessingGiveUp = false;
+    private bool hasCreatedGraveThisSession = false;
 
     public List<GameObject> animalPrefabs;
     public Transform spawnPoint;
     private GameObject currentEgg;
-    private GameObject currentAnimal; // New field to track the spawned animal
+    private GameObject currentAnimal;
 
     public CircularTimer circularTimer;
 
@@ -41,6 +43,7 @@ public class SimpleTimer : MonoBehaviour
         }
 
         SpawnEgg();
+        if (eggMenu != null) eggMenu.SetActive(false);
 
         if (giveUpPopup != null) giveUpPopup.SetActive(false);
         if (yesButton != null) yesButton.onClick.AddListener(OnYesClicked);
@@ -83,6 +86,7 @@ public class SimpleTimer : MonoBehaviour
         timeRemaining = minutes * 60;
         isTimerRunning = true;
         sessionFailed = false;
+        hasCreatedGraveThisSession = false;
         Disc2.SetActive(false);
         Disc.SetActive(false);
         menu.SetActive(false);
@@ -104,6 +108,30 @@ public class SimpleTimer : MonoBehaviour
                 timerButtonLabel.text = "Start Timer";
             }
         }
+
+        if (Input.GetMouseButtonDown(0) && currentEgg != null)
+        {
+            Vector2 tapPosition = Camera.main.ScreenToWorldPoint(Input.mousePosition);
+            RaycastHit2D hit = Physics2D.Raycast(tapPosition, Vector2.zero);
+
+            if (hit.collider != null && hit.collider.gameObject == currentEgg && !eggMenu.activeSelf)
+            {
+                eggMenu.SetActive(true);
+                Debug.Log("Egg menu opened");
+            }
+            else if (eggMenu.activeSelf && !IsTapOnMenu(tapPosition))
+            {
+                eggMenu.SetActive(false);
+                Debug.Log("Egg menu closed by tapping outside");
+            }
+        }
+    }
+
+    bool IsTapOnMenu(Vector2 tapPosition)
+    {
+        Vector2 screenTap = Camera.main.WorldToScreenPoint(tapPosition);
+        RectTransform menuRect = eggMenu.GetComponent<RectTransform>();
+        return RectTransformUtility.RectangleContainsScreenPoint(menuRect, screenTap, Camera.main);
     }
 
     void UpdateTimerDisplay()
@@ -120,6 +148,7 @@ public class SimpleTimer : MonoBehaviour
             Destroy(currentEgg);
             Debug.Log("Egg hatched! You earned a new animal.");
             SpawnRandomAnimal();
+            eggMenu.SetActive(false);
         }
     }
 
@@ -128,7 +157,7 @@ public class SimpleTimer : MonoBehaviour
         if (animalPrefabs.Count > 0 && spawnPoint != null)
         {
             int randomIndex = Random.Range(0, animalPrefabs.Count);
-            currentAnimal = Instantiate(animalPrefabs[randomIndex], spawnPoint.position, Quaternion.identity); // Store the reference
+            currentAnimal = Instantiate(animalPrefabs[randomIndex], spawnPoint.position, Quaternion.identity);
             currentAnimal.name = animalPrefabs[randomIndex].name;
             Debug.Log($"Spawned: {currentAnimal.name}");
 
@@ -161,14 +190,61 @@ public class SimpleTimer : MonoBehaviour
 
     public void GiveUp()
     {
+        if (isProcessingGiveUp) return;
+        isProcessingGiveUp = true;
+
         isTimerRunning = false;
         timeRemaining = 0;
+
         if (currentEgg != null)
         {
             Destroy(currentEgg);
             Debug.Log("Egg destroyed by Give Up action.");
+
+            if (!hasCreatedGraveThisSession)
+            {
+                string graveId = AddGraveToUnlockedList();
+                Debug.Log($"Created grave with ID {graveId}");
+                hasCreatedGraveThisSession = true;
+            }
         }
+
+        ResetToDefaultState();
+        isProcessingGiveUp = false;
+    }
+
+    private void ResetToDefaultState()
+    {
         timerButtonLabel.text = "Start Timer";
+        eggMenu.SetActive(false);
+        Disc.SetActive(true);
+        Disc2.SetActive(true);
+        menu.SetActive(true);
+        UpdateTimerDisplay();
+        SpawnEgg();
+
+        if (circularTimer != null)
+        {
+            circularTimer.currentMinutes = 0;
+            circularTimer.dialImage.fillAmount = 0f;
+            circularTimer.UpdateKnobPosition();
+            circularTimer.UpdateTimeText();
+        }
+    }
+
+    string AddGraveToUnlockedList()
+    {
+        string graveId = "Grave_" + System.DateTime.Now.Ticks;
+        
+        string existingGraves = PlayerPrefs.GetString("UnlockedGraves", "");
+        existingGraves += string.IsNullOrEmpty(existingGraves) ? graveId : "," + graveId;
+        PlayerPrefs.SetString("UnlockedGraves", existingGraves);
+        
+        PlayerPrefs.SetString(graveId + "_date", System.DateTime.Today.ToString("yyyy-MM-dd"));
+        PlayerPrefs.Save();
+        
+        Debug.Log($"Added grave with ID {graveId} to persistent storage");
+        return graveId;
     }
 
     public void ResetAll()
@@ -190,11 +266,11 @@ public class SimpleTimer : MonoBehaviour
             Debug.Log("Egg destroyed by Reset action.");
         }
 
-        if (currentAnimal != null) // Destroy the spawned animal if it exists
+        if (currentAnimal != null)
         {
             Destroy(currentAnimal);
             Debug.Log("Animal despawned by Reset action.");
-            currentAnimal = null; // Clear the reference
+            currentAnimal = null;
         }
 
         SpawnEgg();
@@ -203,14 +279,15 @@ public class SimpleTimer : MonoBehaviour
         Disc.SetActive(true);
         Disc2.SetActive(true);
         unlockPopup.SetActive(false);
-        menu.SetActive(true); // Show menu again, assuming it's visible at start
+        menu.SetActive(true);
+        eggMenu.SetActive(false);
 
         UpdateTimerDisplay();
     }
 
     public void OnYesClicked()
     {
-        ResetAll();
+        GiveUp();
         if (giveUpPopup != null) giveUpPopup.SetActive(false);
     }
 
@@ -226,20 +303,44 @@ public class SimpleTimer : MonoBehaviour
 
     void OnApplicationFocus(bool hasFocus)
     {
-        if (!hasFocus) ApplyPenalty();
+        if (!hasFocus && isTimerRunning && !isProcessingGiveUp)
+        {
+            ApplyPenalty();
+        }
     }
 
     void OnApplicationPause(bool isPaused)
     {
-        if (isPaused) ApplyPenalty();
+        if (isPaused && isTimerRunning && !isProcessingGiveUp)
+        {
+            ApplyPenalty();
+        }
     }
 
     void ApplyPenalty()
     {
+        if (isProcessingGiveUp) return;
+        isProcessingGiveUp = true;
+
         isTimerRunning = false;
         timeRemaining = 0;
-        if (currentEgg != null) Destroy(currentEgg);
-        Debug.Log("Egg destroyed due to distraction!");
+
+        if (currentEgg != null)
+        {
+            Destroy(currentEgg);
+            Debug.Log("Egg destroyed due to distraction.");
+
+            if (!hasCreatedGraveThisSession)
+            {
+                string graveId = AddGraveToUnlockedList();
+                Debug.Log($"Created penalty grave with ID {graveId}");
+                hasCreatedGraveThisSession = true;
+            }
+        }
+        eggMenu.SetActive(false);
+
+        ResetToDefaultState();
+        isProcessingGiveUp = false;
     }
 
     void OnDestroy()
