@@ -69,6 +69,10 @@ public class MenuManager : MonoBehaviour
     public void LoadHome(){
         SceneManager.LoadScene("Menu");    
     }
+    public void LoadShopScene()
+    {
+        SceneManager.LoadScene("shop");
+    }
 
     private bool IsTouchOrClickOutsideMenu()
     {
