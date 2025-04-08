@@ -4,7 +4,6 @@ using TMPro;
 
 public class EggShopManager : MonoBehaviour
 {
-    public int coins;
     public TMP_Text coinUI;
     public ShopItemSO[] shopItemsSO;
     public GameObject[] shopPanelsGO;
@@ -19,31 +18,29 @@ public class EggShopManager : MonoBehaviour
             shopPanelsGO[i].SetActive(true);
         }
         
-        coinUI.text = "Coins: " + coins.ToString();
+        UpdateCoinDisplay();
         LoadPanels();
         CheckPurchaseable();
-        
-        CheckPurchaseable();
     }
 
-    // Update is called once per frame
-    void Update()
+    // Get coins from the centralized system
+    private int GetCoins()
     {
-        
+        return SimpleTimer.TotalCoins;
     }
 
-    public void AddCoins() // simple script to add coins.
+    // Update the UI to show current coins
+    private void UpdateCoinDisplay()
     {
-        coins++;
-        coinUI.text = "Coins: " + coins.ToString();
-        CheckPurchaseable();
+        coinUI.text = "Coins: " + GetCoins().ToString();
     }
 
     public void CheckPurchaseable()
     {
+        int currentCoins = GetCoins();
         for (int i = 0; i < shopItemsSO.Length; i++)
         {
-            if (coins >= shopItemsSO[i].baseCost) //if i have enough money.
+            if (currentCoins >= shopItemsSO[i].baseCost) //if i have enough money.
                 myPurchaseBtns[i].interactable = true;
             else
                 myPurchaseBtns[i].interactable = false;
@@ -52,12 +49,29 @@ public class EggShopManager : MonoBehaviour
 
     public void PurchaseItem(int btnNo)
     {
-        if (coins >= shopItemsSO[btnNo].baseCost)
+        int itemCost = shopItemsSO[btnNo].baseCost;
+        
+        // Use the SimpleTimer's static method to spend coins
+        if (SimpleTimer.SpendCoins(itemCost))
         {
-            coins = coins - shopItemsSO[btnNo].baseCost;
-            coinUI.text = "Coins: " + coins.ToString();
+            Debug.Log($"Purchased {shopItemsSO[btnNo].title} for {itemCost} coins");
+            
+            // Update display
+            UpdateCoinDisplay();
             CheckPurchaseable();
-            //Unlock Item.
+            
+            // Track purchase in PlayerPrefs if needed
+            string purchasedItems = PlayerPrefs.GetString("PurchasedItems", "");
+            purchasedItems += shopItemsSO[btnNo].title + ",";
+            PlayerPrefs.SetString("PurchasedItems", purchasedItems);
+            PlayerPrefs.Save();
+            
+            // Additional purchase logic can go here
+            // For example, unlocking items, changing UI, etc.
+        }
+        else
+        {
+            Debug.Log("Not enough coins to purchase this item");
         }
     }
 
@@ -69,5 +83,13 @@ public class EggShopManager : MonoBehaviour
             shopPanels[i].descriptionTXT.text = shopItemsSO[i].description;
             shopPanels[i].costTXT.text = "Coins: " + shopItemsSO[i].baseCost.ToString();
         }
+    }
+    
+    // For testing purposes - you can remove this in production
+    public void AddTestCoins(int amount) 
+    {
+        SimpleTimer.TotalCoins += amount;
+        UpdateCoinDisplay();
+        CheckPurchaseable();
     }
 }

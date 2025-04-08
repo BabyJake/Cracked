@@ -1,4 +1,4 @@
-  using UnityEngine;
+using UnityEngine;
 using System.Collections.Generic;
 using UnityEngine.SceneManagement;
 using UnityEngine.UI;
@@ -7,13 +7,17 @@ using TMPro;
 public class SimpleTimer : MonoBehaviour
 {
     public TMP_Text timerText;
+    public TMP_Text coinText; // Add UI text for displaying coins
     public GameObject eggPrefab;
     public GameObject Disc;
     public GameObject Disc2;
     public GameObject unlockPopup;
+    public TMP_Text unlockCoinRewardText; // Moved: Text for coins in the unlock popup
+    public TMP_Text animalNameText; // Add this to show animal name in unlock popup
     public TMP_Text timerButtonLabel;
     public GameObject menu;
     public GameObject eggMenu;
+    // Removed: coinRewardPopup and coinRewardText (merged into unlock popup)
 
     public GameObject giveUpPopup;
     public Button yesButton;
@@ -24,6 +28,9 @@ public class SimpleTimer : MonoBehaviour
     private bool sessionFailed = false;
     private bool isProcessingGiveUp = false;
     private bool hasCreatedGraveThisSession = false;
+    private float sessionStartTime; // To track study duration
+    private int coinsPerMinute = 5; // Coins earned per minute of studying
+    private int lastCoinsEarned = 0; // Track coins earned in the latest session
 
     public List<GameObject> animalPrefabs;
     public Transform spawnPoint;
@@ -31,6 +38,17 @@ public class SimpleTimer : MonoBehaviour
     private GameObject currentAnimal;
 
     public CircularTimer circularTimer;
+
+    // Static property to access coins from any script
+    public static int TotalCoins
+    {
+        get { return PlayerPrefs.GetInt("TotalCoins", 0); }
+        set
+        {
+            PlayerPrefs.SetInt("TotalCoins", value);
+            PlayerPrefs.Save();
+        }
+    }
 
     void Start()
     {
@@ -44,10 +62,14 @@ public class SimpleTimer : MonoBehaviour
 
         SpawnEgg();
         if (eggMenu != null) eggMenu.SetActive(false);
+        if (unlockPopup != null) unlockPopup.SetActive(false);
 
         if (giveUpPopup != null) giveUpPopup.SetActive(false);
         if (yesButton != null) yesButton.onClick.AddListener(OnYesClicked);
         if (noButton != null) noButton.onClick.AddListener(OnNoClicked);
+
+        // Update coin display when starting
+        UpdateCoinDisplay();
     }
 
     void SpawnEgg()
@@ -87,6 +109,7 @@ public class SimpleTimer : MonoBehaviour
         isTimerRunning = true;
         sessionFailed = false;
         hasCreatedGraveThisSession = false;
+        sessionStartTime = Time.time; // Record session start time
         Disc2.SetActive(false);
         Disc.SetActive(false);
         menu.SetActive(false);
@@ -104,6 +127,7 @@ public class SimpleTimer : MonoBehaviour
                 isTimerRunning = false;
                 timeRemaining = 0;
                 Debug.Log("Timer complete! Egg hatched!");
+                lastCoinsEarned = AwardCoinsForSession(true); // Track coins earned
                 HatchEgg();
                 timerButtonLabel.text = "Start Timer";
             }
@@ -124,6 +148,47 @@ public class SimpleTimer : MonoBehaviour
                 eggMenu.SetActive(false);
                 Debug.Log("Egg menu closed by tapping outside");
             }
+        }
+    }
+
+    // Award coins based on study duration - modified to return the coins earned
+    int AwardCoinsForSession(bool completed)
+    {
+        float sessionDuration = Time.time - sessionStartTime;
+        int minutes = Mathf.FloorToInt(sessionDuration / 60f);
+        
+        // Calculate coins based on minutes studied
+        int coinsEarned = minutes * coinsPerMinute;
+        
+        // Add bonus for completing the full timer
+        if (completed)
+        {
+            coinsEarned += Mathf.RoundToInt(circularTimer.currentMinutes * 2); // Bonus for completing
+        }
+        
+        // Ensure minimum reward for very short sessions
+        coinsEarned = Mathf.Max(coinsEarned, completed ? 1 : 0);
+        
+        if (coinsEarned > 0)
+        {
+            // Add coins to total
+            TotalCoins += coinsEarned;
+            
+            // Update display
+            UpdateCoinDisplay();
+            
+            Debug.Log($"Awarded {coinsEarned} coins. Total: {TotalCoins}");
+        }
+        
+        return coinsEarned;
+    }
+
+    // Update the coin display UI
+    void UpdateCoinDisplay()
+    {
+        if (coinText != null)
+        {
+            coinText.text = $"Coins: {TotalCoins}";
         }
     }
 
@@ -164,6 +229,22 @@ public class SimpleTimer : MonoBehaviour
             UnlockAnimal(currentAnimal.name);
             PlayerPrefs.SetString("PendingAnimal", currentAnimal.name);
             PlayerPrefs.Save();
+            
+            // Update the animal name and coin reward text in the unlock popup
+            if (animalNameText != null)
+            {
+                animalNameText.text = $"You unlocked: {currentAnimal.name}!";
+            }
+            
+            if (unlockCoinRewardText != null && lastCoinsEarned > 0)
+            {
+                unlockCoinRewardText.text = $"You earned {lastCoinsEarned} coins!";
+                unlockCoinRewardText.gameObject.SetActive(true);
+            }
+            else if (unlockCoinRewardText != null)
+            {
+                unlockCoinRewardText.gameObject.SetActive(false);
+            }
         }
         else
         {
@@ -192,6 +273,12 @@ public class SimpleTimer : MonoBehaviour
     {
         if (isProcessingGiveUp) return;
         isProcessingGiveUp = true;
+
+        // Award partial coins for incomplete session
+        if (isTimerRunning)
+        {
+            lastCoinsEarned = AwardCoinsForSession(false);
+        }
 
         isTimerRunning = false;
         timeRemaining = 0;
@@ -301,6 +388,17 @@ public class SimpleTimer : MonoBehaviour
         SceneManager.LoadScene("Sanctuary");
     }
 
+    // Allow spending coins for items
+    public static bool SpendCoins(int amount)
+    {
+        if (TotalCoins >= amount)
+        {
+            TotalCoins -= amount;
+            return true;
+        }
+        return false;
+    }
+
     void OnApplicationFocus(bool hasFocus)
     {
         if (!hasFocus && isTimerRunning && !isProcessingGiveUp)
@@ -321,6 +419,12 @@ public class SimpleTimer : MonoBehaviour
     {
         if (isProcessingGiveUp) return;
         isProcessingGiveUp = true;
+
+        // Still award coins for time studied before distraction
+        if (isTimerRunning)
+        {
+            lastCoinsEarned = AwardCoinsForSession(false);
+        }
 
         isTimerRunning = false;
         timeRemaining = 0;
