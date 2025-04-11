@@ -5,6 +5,7 @@ using TMPro;
 
 public class PurchasedEggManager : MonoBehaviour
 {
+    public ShopDatabase shopDatabase; // Reference to centralized shop data
     public SimpleTimer simpleTimer;
     public GameObject eggMenuContent;
     public GameObject eggButtonPrefab;
@@ -18,6 +19,12 @@ public class PurchasedEggManager : MonoBehaviour
     void Start()
     {
         Debug.Log("PurchasedEggManager started");
+
+        if (shopDatabase == null || shopDatabase.shopItemsSO == null)
+        {
+            Debug.LogError("ShopDatabase or shopItemsSO not assigned in PurchasedEggManager");
+            return;
+        }
         
         // Add default egg that player always has
         if (defaultEggSO != null)
@@ -91,12 +98,10 @@ public class PurchasedEggManager : MonoBehaviour
     
     ShopItemSO FindEggSOByTitle(string title)
     {
-        // Find the EggShopManager to access all available shop items
-        EggShopManager shopManager = FindObjectOfType<EggShopManager>();
-        if (shopManager != null)
+        if (shopDatabase != null && shopDatabase.shopItemsSO != null)
         {
-            Debug.Log("Found EggShopManager with " + shopManager.shopItemsSO.Length + " items");
-            foreach (ShopItemSO item in shopManager.shopItemsSO)
+            Debug.Log("Searching " + shopDatabase.shopItemsSO.Length + " items"); // Fixed line
+            foreach (ShopItemSO item in shopDatabase.shopItemsSO)
             {
                 if (item != null && item.title == title)
                 {
@@ -108,7 +113,7 @@ public class PurchasedEggManager : MonoBehaviour
         }
         else
         {
-            Debug.LogError("Could not find EggShopManager - make sure it exists in the scene");
+            Debug.LogError("ShopDatabase or shopItemsSO not assigned in PurchasedEggManager");
         }
         return null;
     }

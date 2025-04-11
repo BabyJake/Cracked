@@ -255,10 +255,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 029d2d0545bb88146baaf5f3d768d7c5, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  shopDatabase: {fileID: 11400000, guid: 39b5bf30a22a1a949bfcd20b8fc7eba0, type: 2}
   coinUI: {fileID: 1078722068}
-  shopItemsSO:
-  - {fileID: 11400000, guid: 614f9dc3915425f44be7274a42479e0b, type: 2}
-  - {fileID: 11400000, guid: 7bf861107cd4b714a881b5d4ecf92dac, type: 2}
   shopPanelsGO:
   - {fileID: 955132985}
   - {fileID: 1564890143}
