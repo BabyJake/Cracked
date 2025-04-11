@@ -10,8 +10,9 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 96d298a1d8c4f6241adef3964891da09, type: 3}
-  m_Name: RareEg
+  m_Name: Common Egg
   m_EditorClassIdentifier: 
-  title: RareEgg
+  title: CommonEgg
   description: 
   baseCost: 10
+  itemPrefab: {fileID: 7073543684970146418, guid: 147325d3ace99ad40b67b78ad475fd4a, type: 3}

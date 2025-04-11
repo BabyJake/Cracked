@@ -17,14 +17,13 @@ public class SimpleTimer : MonoBehaviour
     public TMP_Text timerButtonLabel;
     public GameObject menu;
     public GameObject eggMenu;
-    // Removed: coinRewardPopup and coinRewardText (merged into unlock popup)
-
+    
     public GameObject giveUpPopup;
     public Button yesButton;
     public Button noButton;
 
     private float timeRemaining;
-    private bool isTimerRunning;
+    public bool isTimerRunning { get; private set; }
     private bool sessionFailed = false;
     private bool isProcessingGiveUp = false;
     private bool hasCreatedGraveThisSession = false;
@@ -36,6 +35,7 @@ public class SimpleTimer : MonoBehaviour
     public Transform spawnPoint;
     private GameObject currentEgg;
     private GameObject currentAnimal;
+    private GameObject currentEggPrefab;  // Store the current egg prefab reference
 
     public CircularTimer circularTimer;
 
@@ -48,6 +48,12 @@ public class SimpleTimer : MonoBehaviour
             PlayerPrefs.SetInt("TotalCoins", value);
             PlayerPrefs.Save();
         }
+    }
+
+    void Awake()
+    {
+        // Store the initial prefab reference
+        currentEggPrefab = eggPrefab;
     }
 
     void Start()
@@ -72,13 +78,47 @@ public class SimpleTimer : MonoBehaviour
         UpdateCoinDisplay();
     }
 
+    // Method to change the egg prefab
+    public void ChangeEggPrefab(GameObject newEggPrefab)
+    {
+        if (newEggPrefab != null)
+        {
+            // Update current egg prefab reference
+            currentEggPrefab = newEggPrefab;
+            Debug.Log("Changed egg prefab to: " + newEggPrefab.name);
+        }
+        else
+        {
+            Debug.LogError("Attempted to set null egg prefab!");
+        }
+    }
+
+    // Method to respawn the current egg using the current prefab
+    public void RespawnCurrentEgg()
+    {
+        if (!isTimerRunning && currentEgg != null)
+        {
+            // Destroy the current egg
+            Destroy(currentEgg);
+            
+            // Spawn a new egg with the current prefab
+            SpawnEgg();
+        }
+    }
+
     void SpawnEgg()
     {
         Vector3 eggPosition = new Vector3(0f, -2.316304f, 0f);
-        if (eggPrefab != null)
+        if (currentEggPrefab != null)
         {
-            currentEgg = Instantiate(eggPrefab, eggPosition, Quaternion.identity);
+            currentEgg = Instantiate(currentEggPrefab, eggPosition, Quaternion.identity);
             Debug.Log("Egg spawned at: " + eggPosition);
+        }
+        else if (eggPrefab != null)
+        {
+            // Fallback to original eggPrefab if currentEggPrefab is null
+            currentEgg = Instantiate(eggPrefab, eggPosition, Quaternion.identity);
+            Debug.Log("Egg spawned using default prefab at: " + eggPosition);
         }
         else
         {

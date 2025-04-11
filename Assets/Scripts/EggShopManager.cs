@@ -2,6 +2,14 @@ using UnityEngine;
 using UnityEngine.UI;
 using TMPro;
 
+public class EggS : MonoBehaviour
+{
+    public TMP_Text titleTXT;
+    public TMP_Text descriptionTXT;
+    public TMP_Text costTXT;
+    public Image itemImage;  // Added for displaying egg images
+}
+
 public class EggShopManager : MonoBehaviour
 {
     public TMP_Text coinUI;
@@ -21,6 +29,7 @@ public class EggShopManager : MonoBehaviour
         UpdateCoinDisplay();
         LoadPanels();
         CheckPurchaseable();
+        CheckPanel();
     }
 
     // Get coins from the centralized system
@@ -82,8 +91,62 @@ public class EggShopManager : MonoBehaviour
             shopPanels[i].titleTXT.text = shopItemsSO[i].title;
             shopPanels[i].descriptionTXT.text = shopItemsSO[i].description;
             shopPanels[i].costTXT.text = "Coins: " + shopItemsSO[i].baseCost.ToString();
+            
+            // Get image from the item prefab
+            if (shopPanels[i].itemImage != null && shopItemsSO[i].itemPrefab != null)
+            {
+                // Try to get image component directly from the prefab
+                Image prefabImage = shopItemsSO[i].itemPrefab.GetComponent<Image>();
+                
+                // If no Image component, try to get SpriteRenderer
+                if (prefabImage != null && prefabImage.sprite != null)
+                {
+                    shopPanels[i].itemImage.sprite = prefabImage.sprite;
+                }
+                else
+                {
+                    SpriteRenderer spriteRenderer = shopItemsSO[i].itemPrefab.GetComponent<SpriteRenderer>();
+                    if (spriteRenderer != null && spriteRenderer.sprite != null)
+                    {
+                        shopPanels[i].itemImage.sprite = spriteRenderer.sprite;
+                    }
+                    else
+                    {
+                        // If not found on the main object, try to find in children
+                        Image childImage = shopItemsSO[i].itemPrefab.GetComponentInChildren<Image>();
+                        if (childImage != null && childImage.sprite != null)
+                        {
+                            shopPanels[i].itemImage.sprite = childImage.sprite;
+                        }
+                        else
+                        {
+                            SpriteRenderer childSprite = shopItemsSO[i].itemPrefab.GetComponentInChildren<SpriteRenderer>();
+                            if (childSprite != null && childSprite.sprite != null)
+                            {
+                                shopPanels[i].itemImage.sprite = childSprite.sprite;
+                            }
+                        }
+                    }
+                }
+            }
+
+            // Add cost to the purchase button's text
+            TMP_Text buttonText = myPurchaseBtns[i].GetComponentInChildren<TMP_Text>();
+            if (buttonText != null)
+            {
+                buttonText.text = "Buy: " + shopItemsSO[i].baseCost.ToString();
+            }
         }
     }
+
+    public void CheckPanel()
+{
+    for (int i = 0; i < shopItemsSO.Length; i++)
+    {
+        Debug.Log($"Loading panel {i}: Item = {shopItemsSO[i].title}, Cost = {shopItemsSO[i].baseCost}");
+        // rest of your code...
+    }
+}
     
     // For testing purposes - you can remove this in production
     public void AddTestCoins(int amount) 
