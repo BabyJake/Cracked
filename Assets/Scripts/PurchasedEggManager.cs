@@ -5,16 +5,16 @@ using TMPro;
 
 public class PurchasedEggManager : MonoBehaviour
 {
-    public ShopDatabase shopDatabase; // Reference to centralized shop data
+    public ShopDatabase shopDatabase;
     public SimpleTimer simpleTimer;
     public GameObject eggMenuContent;
     public GameObject eggButtonPrefab;
-    
-    // Reference to the ShopItemSO for default egg
     public ShopItemSO defaultEggSO;
+    public TMP_Text totalEggsBoughtText; // New UI element to display total eggs bought
     
     private string currentSelectedEgg;
     private Dictionary<string, ShopItemSO> availableEggs = new Dictionary<string, ShopItemSO>();
+    private Dictionary<string, int> eggQuantities = new Dictionary<string, int>(); // To track quantities
     
     void Start()
     {
@@ -26,33 +26,41 @@ public class PurchasedEggManager : MonoBehaviour
             return;
         }
         
-        // Add default egg that player always has
-        if (defaultEggSO != null)
+        if (totalEggsBoughtText == null)
         {
-            availableEggs.Add(defaultEggSO.title, defaultEggSO);
+            Debug.LogError("totalEggsBoughtText not assigned in PurchasedEggManager");
         }
         
-        // Load purchased eggs from PlayerPrefs
+        // Add default egg (count as 1 if not purchased)
+        if (defaultEggSO != null && !eggQuantities.ContainsKey(defaultEggSO.title))
+        {
+            availableEggs.Add(defaultEggSO.title, defaultEggSO);
+            eggQuantities[defaultEggSO.title] = 1; // Default egg counts as 1
+        }
+        
+        // Load purchased eggs and quantities
         LoadPurchasedEggs();
         
         // Populate the egg menu
         PopulateEggMenu();
         
-        // Set current egg (default to the first available one)
+        // Set current egg
         if (!string.IsNullOrEmpty(PlayerPrefs.GetString("CurrentSelectedEgg", "")))
         {
             currentSelectedEgg = PlayerPrefs.GetString("CurrentSelectedEgg");
         }
         else if (availableEggs.Count > 0)
         {
-            // Default to first egg if none selected
             currentSelectedEgg = new List<string>(availableEggs.Keys)[0];
             PlayerPrefs.SetString("CurrentSelectedEgg", currentSelectedEgg);
             PlayerPrefs.Save();
         }
         
-        // Apply the selected egg to the current egg
+        // Apply the selected egg
         ApplySelectedEgg();
+        
+        // Update total eggs bought display
+        UpdateTotalEggsBought();
     }
     
     void LoadPurchasedEggs()
@@ -62,45 +70,47 @@ public class PurchasedEggManager : MonoBehaviour
         
         if (!string.IsNullOrEmpty(purchasedItems))
         {
-            string[] purchasedEggs = purchasedItems.Split(',');
+            string[] purchasedEggs = purchasedItems.Split(',', System.StringSplitOptions.RemoveEmptyEntries);
             Debug.Log("Found " + purchasedEggs.Length + " items in the split array");
             
-            foreach (string eggName in purchasedEggs)
+            foreach (string eggEntry in purchasedEggs)
             {
-                Debug.Log("Processing egg: '" + eggName + "'");
-                if (!string.IsNullOrEmpty(eggName) && !availableEggs.ContainsKey(eggName))
+                string[] parts = eggEntry.Split(':');
+                if (parts.Length != 2 || !int.TryParse(parts[1], out int quantity)) continue;
+                
+                string eggName = parts[0];
+                Debug.Log("Processing egg: '" + eggName + "' with quantity: " + quantity);
+                
+                if (!availableEggs.ContainsKey(eggName))
                 {
-                    // Find the corresponding ShopItemSO
                     ShopItemSO eggData = FindEggSOByTitle(eggName);
                     if (eggData != null)
                     {
                         Debug.Log("Successfully added egg: " + eggName);
                         availableEggs.Add(eggName, eggData);
+                        eggQuantities[eggName] = quantity;
                     }
                     else
                     {
                         Debug.LogWarning("Could not find egg data for: " + eggName);
                     }
                 }
-                else if (string.IsNullOrEmpty(eggName))
+                else
                 {
-                    Debug.Log("Skipping empty egg name");
-                }
-                else if (availableEggs.ContainsKey(eggName))
-                {
+                    eggQuantities[eggName] = quantity; // Update quantity if already added
                     Debug.Log("Egg already in dictionary: " + eggName);
                 }
             }
         }
         
-        Debug.Log("Total eggs loaded: " + availableEggs.Count);
+        Debug.Log("Total unique eggs loaded: " + availableEggs.Count);
     }
     
     ShopItemSO FindEggSOByTitle(string title)
     {
         if (shopDatabase != null && shopDatabase.shopItemsSO != null)
         {
-            Debug.Log("Searching " + shopDatabase.shopItemsSO.Length + " items"); // Fixed line
+            Debug.Log("Searching " + shopDatabase.shopItemsSO.Length + " items");
             foreach (ShopItemSO item in shopDatabase.shopItemsSO)
             {
                 if (item != null && item.title == title)
@@ -122,23 +132,19 @@ public class PurchasedEggManager : MonoBehaviour
     {
         Debug.Log("Populating egg menu with " + availableEggs.Count + " eggs");
         
-        // Clear existing egg buttons
         foreach (Transform child in eggMenuContent.transform)
         {
             Destroy(child.gameObject);
         }
         
-        // Add button for each available egg
         foreach (KeyValuePair<string, ShopItemSO> egg in availableEggs)
         {
             Debug.Log("Creating button for egg: " + egg.Key);
             GameObject eggButton = Instantiate(eggButtonPrefab, eggMenuContent.transform);
             
-            // Set button image from itemPrefab's sprite
             Image buttonImage = eggButton.GetComponent<Image>();
             if (buttonImage != null && egg.Value.itemPrefab != null)
             {
-                // Try to get image component directly from the prefab
                 Image prefabImage = egg.Value.itemPrefab.GetComponent<Image>();
                 if (prefabImage != null && prefabImage.sprite != null)
                 {
@@ -153,7 +159,6 @@ public class PurchasedEggManager : MonoBehaviour
                     }
                     else
                     {
-                        // If not found on the main object, try to find in children
                         Image childImage = egg.Value.itemPrefab.GetComponentInChildren<Image>();
                         if (childImage != null && childImage.sprite != null)
                         {
@@ -175,15 +180,20 @@ public class PurchasedEggManager : MonoBehaviour
                 }
             }
             
-            // Add click handler
             Button button = eggButton.GetComponent<Button>();
-            string eggName = egg.Key; // Create local variable to capture for lambda
+            string eggName = egg.Key;
             button.onClick.AddListener(() => SelectEgg(eggName));
             
-            // Highlight the currently selected egg
             if (eggName == currentSelectedEgg)
             {
-                button.interactable = false; // Visual indicator of selection
+                button.interactable = false;
+            }
+            
+            // Optional: Display quantity on the button
+            TMP_Text buttonText = button.GetComponentInChildren<TMP_Text>();
+            if (buttonText != null)
+            {
+                buttonText.text = $"{eggName} (x{eggQuantities[eggName]})";
             }
         }
     }
@@ -196,7 +206,6 @@ public class PurchasedEggManager : MonoBehaviour
             PlayerPrefs.SetString("CurrentSelectedEgg", eggName);
             PlayerPrefs.Save();
             
-            // Apply selection to current egg if timer is not running
             if (!simpleTimer.isTimerRunning)
             {
                 ApplySelectedEgg();
@@ -206,7 +215,6 @@ public class PurchasedEggManager : MonoBehaviour
                 Debug.Log("Egg selection will be applied after current timer completes");
             }
             
-            // Update visual selection in menu
             PopulateEggMenu();
         }
     }
@@ -215,23 +223,33 @@ public class PurchasedEggManager : MonoBehaviour
     {
         if (simpleTimer != null && availableEggs.ContainsKey(currentSelectedEgg))
         {
-            // Change the egg prefab in SimpleTimer
             simpleTimer.ChangeEggPrefab(availableEggs[currentSelectedEgg].itemPrefab);
-            
-            // Respawn the egg with the new prefab
             simpleTimer.RespawnCurrentEgg();
         }
     }
     
-    // Utility method to clear PlayerPrefs data for testing
+    void UpdateTotalEggsBought()
+    {
+        if (totalEggsBoughtText != null)
+        {
+            int totalEggs = 0;
+            foreach (int quantity in eggQuantities.Values)
+            {
+                totalEggs += quantity;
+            }
+            totalEggsBoughtText.text = "Eggs Bought: " + totalEggs;
+            Debug.Log("Total eggs bought: " + totalEggs);
+        }
+    }
+    
     public void ClearPurchasedEggs()
     {
         PlayerPrefs.DeleteKey("PurchasedItems");
         PlayerPrefs.DeleteKey("CurrentSelectedEgg");
         PlayerPrefs.Save();
         Debug.Log("Cleared purchased eggs data");
-        
-        // Reload the scene or just restart the manager
+        eggQuantities.Clear();
+        availableEggs.Clear();
         Start();
     }
 }

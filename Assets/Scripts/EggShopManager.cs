@@ -1,7 +1,8 @@
 using UnityEngine;
 using UnityEngine.UI;
 using TMPro;
-
+using System.Collections.Generic;
+using System.Linq;
 public class EggShopManager : MonoBehaviour
 {
     public ShopDatabase shopDatabase; // Reference to centralized shop data
@@ -49,7 +50,7 @@ public class EggShopManager : MonoBehaviour
         int currentCoins = GetCoins();
         for (int i = 0; i < shopDatabase.shopItemsSO.Length; i++)
         {
-            if (currentCoins >= shopDatabase.shopItemsSO[i].baseCost) // If I have enough money
+            if (currentCoins >= shopDatabase.shopItemsSO[i].baseCost)
                 myPurchaseBtns[i].interactable = true;
             else
                 myPurchaseBtns[i].interactable = false;
@@ -62,33 +63,56 @@ public class EggShopManager : MonoBehaviour
 
         int itemCost = shopDatabase.shopItemsSO[btnNo].baseCost;
         
-        // Use the SimpleTimer's static method to spend coins
         if (SimpleTimer.SpendCoins(itemCost))
         {
-            Debug.Log($"Purchased {shopDatabase.shopItemsSO[btnNo].title} for {itemCost} coins");
+            string eggTitle = shopDatabase.shopItemsSO[btnNo].title;
+            Debug.Log($"Purchased {eggTitle} for {itemCost} coins");
             
             // Update display
             UpdateCoinDisplay();
             CheckPurchaseable();
             
-            // Track purchase in PlayerPrefs, avoid duplicates
+            // Update PlayerPrefs with quantity
             string purchasedItems = PlayerPrefs.GetString("PurchasedItems", "");
-            string eggTitle = shopDatabase.shopItemsSO[btnNo].title;
-            if (!purchasedItems.Contains(eggTitle + ","))
+            Dictionary<string, int> eggQuantities = ParsePurchasedItems(purchasedItems);
+            
+            if (eggQuantities.ContainsKey(eggTitle))
             {
-                purchasedItems += eggTitle + ",";
-                PlayerPrefs.SetString("PurchasedItems", purchasedItems);
-                PlayerPrefs.Save();
+                eggQuantities[eggTitle]++;
             }
             else
             {
-                Debug.Log($"Egg {eggTitle} already purchased");
+                eggQuantities[eggTitle] = 1;
             }
+
+            // Save updated quantities back to PlayerPrefs
+            string updatedPurchasedItems = string.Join(",", eggQuantities.Select(kvp => $"{kvp.Key}:{kvp.Value}")) + ",";
+            PlayerPrefs.SetString("PurchasedItems", updatedPurchasedItems);
+            PlayerPrefs.Save();
+            Debug.Log($"Updated PurchasedItems: {updatedPurchasedItems}");
         }
         else
         {
             Debug.Log("Not enough coins to purchase this item");
         }
+    }
+
+    private Dictionary<string, int> ParsePurchasedItems(string purchasedItems)
+    {
+        Dictionary<string, int> eggQuantities = new Dictionary<string, int>();
+        if (!string.IsNullOrEmpty(purchasedItems))
+        {
+            string[] items = purchasedItems.Split(',', System.StringSplitOptions.RemoveEmptyEntries);
+            foreach (string item in items)
+            {
+                string[] parts = item.Split(':');
+                if (parts.Length == 2 && int.TryParse(parts[1], out int quantity))
+                {
+                    eggQuantities[parts[0]] = quantity;
+                }
+            }
+        }
+        return eggQuantities;
     }
 
     public void LoadPanels()
@@ -101,13 +125,9 @@ public class EggShopManager : MonoBehaviour
             shopPanels[i].descriptionTXT.text = shopDatabase.shopItemsSO[i].description;
             shopPanels[i].costTXT.text = "Coins: " + shopDatabase.shopItemsSO[i].baseCost.ToString();
             
-            // Get image from the item prefab
             if (shopPanels[i].itemImage != null && shopDatabase.shopItemsSO[i].itemPrefab != null)
             {
-                // Try to get image component directly from the prefab
                 Image prefabImage = shopDatabase.shopItemsSO[i].itemPrefab.GetComponent<Image>();
-                
-                // If no Image component, try to get SpriteRenderer
                 if (prefabImage != null && prefabImage.sprite != null)
                 {
                     shopPanels[i].itemImage.sprite = prefabImage.sprite;
@@ -121,7 +141,6 @@ public class EggShopManager : MonoBehaviour
                     }
                     else
                     {
-                        // If not found on the main object, try to find in children
                         Image childImage = shopDatabase.shopItemsSO[i].itemPrefab.GetComponentInChildren<Image>();
                         if (childImage != null && childImage.sprite != null)
                         {
@@ -139,7 +158,6 @@ public class EggShopManager : MonoBehaviour
                 }
             }
 
-            // Add cost to the purchase button's text
             TMP_Text buttonText = myPurchaseBtns[i].GetComponentInChildren<TMP_Text>();
             if (buttonText != null)
             {
@@ -158,7 +176,6 @@ public class EggShopManager : MonoBehaviour
         }
     }
     
-    // For testing purposes - you can remove this in production
     public void AddTestCoins(int amount) 
     {
         SimpleTimer.TotalCoins += amount;
