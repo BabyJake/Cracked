@@ -231,7 +231,7 @@ public class PurchasedEggManager : MonoBehaviour
                 totalEggs += quantity;
             }
             totalEggsBoughtText.text = "Eggs Bought: " + totalEggs;
-            Debug.Log("Total eggs bought: " + totalEggs);
+            Debug.Log("Total Eggs: " + totalEggs);
         }
     }
     

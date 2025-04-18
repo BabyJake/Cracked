@@ -48,10 +48,7 @@ public class EggShopManager : MonoBehaviour
         int currentCoins = GetCoins();
         for (int i = 0; i < shopDatabase.shopItemsSO.Length; i++)
         {
-            if (currentCoins >= shopDatabase.shopItemsSO[i].baseCost)
-                myPurchaseBtns[i].interactable = true;
-            else
-                myPurchaseBtns[i].interactable = false;
+            myPurchaseBtns[i].interactable = currentCoins >= shopDatabase.shopItemsSO[i].baseCost;
         }
     }
 
@@ -60,26 +57,22 @@ public class EggShopManager : MonoBehaviour
         if (shopDatabase == null || shopDatabase.shopItemsSO == null) return;
 
         int itemCost = shopDatabase.shopItemsSO[btnNo].baseCost;
-        
+
         if (SimpleTimer.SpendCoins(itemCost))
         {
             string eggTitle = shopDatabase.shopItemsSO[btnNo].title;
             Debug.Log($"Purchased {eggTitle} for {itemCost} coins");
-            
+
             UpdateCoinDisplay();
             CheckPurchaseable();
-            
+
             string purchasedItems = PlayerPrefs.GetString("PurchasedItems", "");
             Dictionary<string, int> eggQuantities = ParsePurchasedItems(purchasedItems);
-            
+
             if (eggQuantities.ContainsKey(eggTitle))
-            {
                 eggQuantities[eggTitle]++;
-            }
             else
-            {
                 eggQuantities[eggTitle] = 1;
-            }
 
             string updatedPurchasedItems = string.Join(",", eggQuantities.Select(kvp => $"{kvp.Key}:{kvp.Value}")) + ",";
             PlayerPrefs.SetString("PurchasedItems", updatedPurchasedItems);
@@ -119,7 +112,7 @@ public class EggShopManager : MonoBehaviour
             shopPanels[i].titleTXT.text = shopDatabase.shopItemsSO[i].title;
             shopPanels[i].descriptionTXT.text = shopDatabase.shopItemsSO[i].description;
             shopPanels[i].costTXT.text = "Coins: " + shopDatabase.shopItemsSO[i].baseCost.ToString();
-            
+
             // Display possible animals
             string animalsList = "\nPossible Animals:\n";
             foreach (var spawnChance in shopDatabase.shopItemsSO[i].animalSpawnChances)
@@ -131,37 +124,10 @@ public class EggShopManager : MonoBehaviour
             }
             shopPanels[i].descriptionTXT.text += animalsList;
 
+            // Set sprite and color
             if (shopPanels[i].itemImage != null && shopDatabase.shopItemsSO[i].itemPrefab != null)
             {
-                Image prefabImage = shopDatabase.shopItemsSO[i].itemPrefab.GetComponent<Image>();
-                if (prefabImage != null && prefabImage.sprite != null)
-                {
-                    shopPanels[i].itemImage.sprite = prefabImage.sprite;
-                }
-                else
-                {
-                    SpriteRenderer spriteRenderer = shopDatabase.shopItemsSO[i].itemPrefab.GetComponent<SpriteRenderer>();
-                    if (spriteRenderer != null && spriteRenderer.sprite != null)
-                    {
-                        shopPanels[i].itemImage.sprite = spriteRenderer.sprite;
-                    }
-                    else
-                    {
-                        Image childImage = shopDatabase.shopItemsSO[i].itemPrefab.GetComponentInChildren<Image>();
-                        if (childImage != null && childImage.sprite != null)
-                        {
-                            shopPanels[i].itemImage.sprite = childImage.sprite;
-                        }
-                        else
-                        {
-                            SpriteRenderer childSprite = shopDatabase.shopItemsSO[i].itemPrefab.GetComponentInChildren<SpriteRenderer>();
-                            if (childSprite != null && childSprite.sprite != null)
-                            {
-                                shopPanels[i].itemImage.sprite = childSprite.sprite;
-                            }
-                        }
-                    }
-                }
+                SetImageAndColorFromPrefab(shopDatabase.shopItemsSO[i].itemPrefab, shopPanels[i].itemImage);
             }
 
             TMP_Text buttonText = myPurchaseBtns[i].GetComponentInChildren<TMP_Text>();
@@ -169,6 +135,41 @@ public class EggShopManager : MonoBehaviour
             {
                 buttonText.text = "Buy: " + shopDatabase.shopItemsSO[i].baseCost.ToString();
             }
+        }
+    }
+
+    private void SetImageAndColorFromPrefab(GameObject prefab, Image targetImage)
+    {
+        Image prefabImage = prefab.GetComponent<Image>();
+        if (prefabImage != null && prefabImage.sprite != null)
+        {
+            targetImage.sprite = prefabImage.sprite;
+            targetImage.color = prefabImage.color;
+            return;
+        }
+
+        SpriteRenderer spriteRenderer = prefab.GetComponent<SpriteRenderer>();
+        if (spriteRenderer != null && spriteRenderer.sprite != null)
+        {
+            targetImage.sprite = spriteRenderer.sprite;
+            targetImage.color = spriteRenderer.color;
+            return;
+        }
+
+        Image childImage = prefab.GetComponentInChildren<Image>();
+        if (childImage != null && childImage.sprite != null)
+        {
+            targetImage.sprite = childImage.sprite;
+            targetImage.color = childImage.color;
+            return;
+        }
+
+        SpriteRenderer childSprite = prefab.GetComponentInChildren<SpriteRenderer>();
+        if (childSprite != null && childSprite.sprite != null)
+        {
+            targetImage.sprite = childSprite.sprite;
+            targetImage.color = childSprite.color;
+            return;
         }
     }
 
@@ -181,8 +182,8 @@ public class EggShopManager : MonoBehaviour
             Debug.Log($"Loading panel {i}: Item = {shopDatabase.shopItemsSO[i].title}, Cost = {shopDatabase.shopItemsSO[i].baseCost}");
         }
     }
-    
-    public void AddTestCoins(int amount) 
+
+    public void AddTestCoins(int amount)
     {
         SimpleTimer.TotalCoins += amount;
         UpdateCoinDisplay();
