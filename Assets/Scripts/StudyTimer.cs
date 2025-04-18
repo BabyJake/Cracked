@@ -3,17 +3,17 @@ using System.Collections.Generic;
 using UnityEngine.SceneManagement;
 using UnityEngine.UI;
 using TMPro;
-
+using System.Linq;
 public class SimpleTimer : MonoBehaviour
 {
     public TMP_Text timerText;
-    public TMP_Text coinText; // Add UI text for displaying coins
+    public TMP_Text coinText;
     public GameObject eggPrefab;
     public GameObject Disc;
     public GameObject Disc2;
     public GameObject unlockPopup;
-    public TMP_Text unlockCoinRewardText; // Moved: Text for coins in the unlock popup
-    public TMP_Text animalNameText; // Add this to show animal name in unlock popup
+    public TMP_Text unlockCoinRewardText;
+    public TMP_Text animalNameText;
     public TMP_Text timerButtonLabel;
     public GameObject menu;
     public GameObject eggMenu;
@@ -27,19 +27,19 @@ public class SimpleTimer : MonoBehaviour
     private bool sessionFailed = false;
     private bool isProcessingGiveUp = false;
     private bool hasCreatedGraveThisSession = false;
-    private float sessionStartTime; // To track study duration
-    private int coinsPerMinute = 5; // Coins earned per minute of studying
-    private int lastCoinsEarned = 0; // Track coins earned in the latest session
+    private float sessionStartTime;
+    private int coinsPerMinute = 5;
+    private int lastCoinsEarned = 0;
 
     public List<GameObject> animalPrefabs;
     public Transform spawnPoint;
     private GameObject currentEgg;
     private GameObject currentAnimal;
-    private GameObject currentEggPrefab;  // Store the current egg prefab reference
+    private GameObject currentEggPrefab;
+    private ShopItemSO currentEggSO; // Reference to current egg's ShopItemSO
 
     public CircularTimer circularTimer;
 
-    // Static property to access coins from any script
     public static int TotalCoins
     {
         get { return PlayerPrefs.GetInt("TotalCoins", 0); }
@@ -52,7 +52,6 @@ public class SimpleTimer : MonoBehaviour
 
     void Awake()
     {
-        // Store the initial prefab reference
         currentEggPrefab = eggPrefab;
     }
 
@@ -66,6 +65,14 @@ public class SimpleTimer : MonoBehaviour
             circularTimer.currentMinutes = 0;
         }
 
+        // Initialize default egg
+        PurchasedEggManager eggManager = FindObjectOfType<PurchasedEggManager>();
+        if (eggManager != null && eggManager.defaultEggSO != null)
+        {
+            currentEggSO = eggManager.defaultEggSO;
+            currentEggPrefab = eggManager.defaultEggSO.itemPrefab;
+        }
+
         SpawnEgg();
         if (eggMenu != null) eggMenu.SetActive(false);
         if (unlockPopup != null) unlockPopup.SetActive(false);
@@ -74,34 +81,28 @@ public class SimpleTimer : MonoBehaviour
         if (yesButton != null) yesButton.onClick.AddListener(OnYesClicked);
         if (noButton != null) noButton.onClick.AddListener(OnNoClicked);
 
-        // Update coin display when starting
         UpdateCoinDisplay();
     }
 
-    // Method to change the egg prefab
-    public void ChangeEggPrefab(GameObject newEggPrefab)
+    public void ChangeEggPrefab(GameObject newEggPrefab, ShopItemSO eggSO)
     {
-        if (newEggPrefab != null)
+        if (newEggPrefab != null && eggSO != null)
         {
-            // Update current egg prefab reference
             currentEggPrefab = newEggPrefab;
-            Debug.Log("Changed egg prefab to: " + newEggPrefab.name);
+            currentEggSO = eggSO;
+            Debug.Log($"Changed egg to {eggSO.title} with prefab {newEggPrefab.name}");
         }
         else
         {
-            Debug.LogError("Attempted to set null egg prefab!");
+            Debug.LogError("Attempted to set null egg prefab or ShopItemSO!");
         }
     }
 
-    // Method to respawn the current egg using the current prefab
     public void RespawnCurrentEgg()
     {
         if (!isTimerRunning && currentEgg != null)
         {
-            // Destroy the current egg
             Destroy(currentEgg);
-            
-            // Spawn a new egg with the current prefab
             SpawnEgg();
         }
     }
@@ -112,13 +113,13 @@ public class SimpleTimer : MonoBehaviour
         if (currentEggPrefab != null)
         {
             currentEgg = Instantiate(currentEggPrefab, eggPosition, Quaternion.identity);
-            Debug.Log("Egg spawned at: " + eggPosition);
+            Debug.Log($"Egg spawned at: {eggPosition} using prefab: {currentEggPrefab.name}");
         }
         else if (eggPrefab != null)
         {
-            // Fallback to original eggPrefab if currentEggPrefab is null
             currentEgg = Instantiate(eggPrefab, eggPosition, Quaternion.identity);
-            Debug.Log("Egg spawned using default prefab at: " + eggPosition);
+            currentEggSO = null;
+            Debug.Log($"Egg spawned using default prefab at: {eggPosition}");
         }
         else
         {
@@ -149,7 +150,7 @@ public class SimpleTimer : MonoBehaviour
         isTimerRunning = true;
         sessionFailed = false;
         hasCreatedGraveThisSession = false;
-        sessionStartTime = Time.time; // Record session start time
+        sessionStartTime = Time.time;
         Disc2.SetActive(false);
         Disc.SetActive(false);
         menu.SetActive(false);
@@ -167,7 +168,7 @@ public class SimpleTimer : MonoBehaviour
                 isTimerRunning = false;
                 timeRemaining = 0;
                 Debug.Log("Timer complete! Egg hatched!");
-                lastCoinsEarned = AwardCoinsForSession(true); // Track coins earned
+                lastCoinsEarned = AwardCoinsForSession(true);
                 HatchEgg();
                 timerButtonLabel.text = "Start Timer";
             }
@@ -191,39 +192,25 @@ public class SimpleTimer : MonoBehaviour
         }
     }
 
-    // Award coins based on study duration - modified to return the coins earned
     int AwardCoinsForSession(bool completed)
     {
         float sessionDuration = Time.time - sessionStartTime;
         int minutes = Mathf.FloorToInt(sessionDuration / 60f);
-        
-        // Calculate coins based on minutes studied
         int coinsEarned = minutes * coinsPerMinute;
-        
-        // Add bonus for completing the full timer
         if (completed)
         {
-            coinsEarned += Mathf.RoundToInt(circularTimer.currentMinutes * 2); // Bonus for completing
+            coinsEarned += Mathf.RoundToInt(circularTimer.currentMinutes * 2);
         }
-        
-        // Ensure minimum reward for very short sessions
         coinsEarned = Mathf.Max(coinsEarned, completed ? 1 : 0);
-        
         if (coinsEarned > 0)
         {
-            // Add coins to total
             TotalCoins += coinsEarned;
-            
-            // Update display
             UpdateCoinDisplay();
-            
             Debug.Log($"Awarded {coinsEarned} coins. Total: {TotalCoins}");
         }
-        
         return coinsEarned;
     }
 
-    // Update the coin display UI
     void UpdateCoinDisplay()
     {
         if (coinText != null)
@@ -259,38 +246,83 @@ public class SimpleTimer : MonoBehaviour
 
     void SpawnRandomAnimal()
     {
-        if (animalPrefabs.Count > 0 && spawnPoint != null)
+        if (currentEggSO != null && currentEggSO.animalSpawnChances.Count > 0)
         {
-            int randomIndex = Random.Range(0, animalPrefabs.Count);
-            currentAnimal = Instantiate(animalPrefabs[randomIndex], spawnPoint.position, Quaternion.identity);
-            currentAnimal.name = animalPrefabs[randomIndex].name;
-            Debug.Log($"Spawned: {currentAnimal.name}");
+            float totalChance = currentEggSO.animalSpawnChances.Sum(x => x.spawnChance);
+            float randomValue = Random.Range(0f, totalChance);
+            float cumulative = 0f;
 
-            UnlockAnimal(currentAnimal.name);
-            PlayerPrefs.SetString("PendingAnimal", currentAnimal.name);
-            PlayerPrefs.Save();
-            
-            // Update the animal name and coin reward text in the unlock popup
-            if (animalNameText != null)
+            foreach (var spawnChance in currentEggSO.animalSpawnChances)
             {
-                animalNameText.text = $"You unlocked: {currentAnimal.name}!";
-            }
-            
-            if (unlockCoinRewardText != null && lastCoinsEarned > 0)
-            {
-                unlockCoinRewardText.text = $"You earned {lastCoinsEarned} coins!";
-                unlockCoinRewardText.gameObject.SetActive(true);
-            }
-            else if (unlockCoinRewardText != null)
-            {
-                unlockCoinRewardText.gameObject.SetActive(false);
+                cumulative += spawnChance.spawnChance;
+                if (randomValue <= cumulative)
+                {
+                    if (spawnChance.animalPrefab != null)
+                    {
+                        currentAnimal = Instantiate(spawnChance.animalPrefab, spawnPoint.position, Quaternion.identity);
+                        currentAnimal.name = spawnChance.animalPrefab.name;
+                        Debug.Log($"Spawned: {currentAnimal.name}");
+
+                        UnlockAnimal(currentAnimal.name);
+                        PlayerPrefs.SetString("PendingAnimal", currentAnimal.name);
+                        PlayerPrefs.Save();
+
+                        if (animalNameText != null)
+                        {
+                            animalNameText.text = $"You unlocked: {currentAnimal.name}!";
+                        }
+                        if (unlockCoinRewardText != null && lastCoinsEarned > 0)
+                        {
+                            unlockCoinRewardText.text = $"You earned {lastCoinsEarned} coins!";
+                            unlockCoinRewardText.gameObject.SetActive(true);
+                        }
+                        else if (unlockCoinRewardText != null)
+                        {
+                            unlockCoinRewardText.gameObject.SetActive(false);
+                        }
+                        unlockPopup.SetActive(true);
+                        return;
+                    }
+                    else
+                    {
+                        Debug.LogWarning("Animal prefab is null in spawn chances!");
+                    }
+                }
             }
         }
         else
         {
-            Debug.LogError("No animal prefabs assigned or spawn point missing!");
+            if (animalPrefabs.Count > 0 && spawnPoint != null)
+            {
+                int randomIndex = Random.Range(0, animalPrefabs.Count);
+                currentAnimal = Instantiate(animalPrefabs[randomIndex], spawnPoint.position, Quaternion.identity);
+                currentAnimal.name = animalPrefabs[randomIndex].name;
+                Debug.Log($"Spawned (fallback): {currentAnimal.name}");
+
+                UnlockAnimal(currentAnimal.name);
+                PlayerPrefs.SetString("PendingAnimal", currentAnimal.name);
+                PlayerPrefs.Save();
+
+                if (animalNameText != null)
+                {
+                    animalNameText.text = $"You unlocked: {currentAnimal.name}!";
+                }
+                if (unlockCoinRewardText != null && lastCoinsEarned > 0)
+                {
+                    unlockCoinRewardText.text = $"You earned {lastCoinsEarned} coins!";
+                    unlockCoinRewardText.gameObject.SetActive(true);
+                }
+                else if (unlockCoinRewardText != null)
+                {
+                    unlockCoinRewardText.gameObject.SetActive(false);
+                }
+                unlockPopup.SetActive(true);
+            }
+            else
+            {
+                Debug.LogError("No animal prefabs assigned or spawn point missing!");
+            }
         }
-        unlockPopup.SetActive(true);
     }
 
     void UnlockAnimal(string animalName)
@@ -314,7 +346,6 @@ public class SimpleTimer : MonoBehaviour
         if (isProcessingGiveUp) return;
         isProcessingGiveUp = true;
 
-        // Award partial coins for incomplete session
         if (isTimerRunning)
         {
             lastCoinsEarned = AwardCoinsForSession(false);
@@ -362,14 +393,11 @@ public class SimpleTimer : MonoBehaviour
     string AddGraveToUnlockedList()
     {
         string graveId = "Grave_" + System.DateTime.Now.Ticks;
-        
         string existingGraves = PlayerPrefs.GetString("UnlockedGraves", "");
         existingGraves += string.IsNullOrEmpty(existingGraves) ? graveId : "," + graveId;
         PlayerPrefs.SetString("UnlockedGraves", existingGraves);
-        
         PlayerPrefs.SetString(graveId + "_date", System.DateTime.Today.ToString("yyyy-MM-dd"));
         PlayerPrefs.Save();
-        
         Debug.Log($"Added grave with ID {graveId} to persistent storage");
         return graveId;
     }
@@ -428,7 +456,6 @@ public class SimpleTimer : MonoBehaviour
         SceneManager.LoadScene("Sanctuary");
     }
 
-    // Allow spending coins for items
     public static bool SpendCoins(int amount)
     {
         if (TotalCoins >= amount)
@@ -460,7 +487,6 @@ public class SimpleTimer : MonoBehaviour
         if (isProcessingGiveUp) return;
         isProcessingGiveUp = true;
 
-        // Still award coins for time studied before distraction
         if (isTimerRunning)
         {
             lastCoinsEarned = AwardCoinsForSession(false);

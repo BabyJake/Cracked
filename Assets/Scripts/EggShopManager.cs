@@ -1,17 +1,17 @@
 using UnityEngine;
+using System.Collections.Generic;
 using UnityEngine.UI;
 using TMPro;
-using System.Collections.Generic;
 using System.Linq;
+
 public class EggShopManager : MonoBehaviour
 {
-    public ShopDatabase shopDatabase; // Reference to centralized shop data
+    public ShopDatabase shopDatabase;
     public TMP_Text coinUI;
     public GameObject[] shopPanelsGO;
     public ShopTemplate[] shopPanels;
     public Button[] myPurchaseBtns;
 
-    // Start is called before the first frame update
     void Start()
     {
         if (shopDatabase == null || shopDatabase.shopItemsSO == null)
@@ -31,13 +31,11 @@ public class EggShopManager : MonoBehaviour
         CheckPanel();
     }
 
-    // Get coins from the centralized system
     private int GetCoins()
     {
         return SimpleTimer.TotalCoins;
     }
 
-    // Update the UI to show current coins
     private void UpdateCoinDisplay()
     {
         coinUI.text = "Coins: " + GetCoins().ToString();
@@ -68,11 +66,9 @@ public class EggShopManager : MonoBehaviour
             string eggTitle = shopDatabase.shopItemsSO[btnNo].title;
             Debug.Log($"Purchased {eggTitle} for {itemCost} coins");
             
-            // Update display
             UpdateCoinDisplay();
             CheckPurchaseable();
             
-            // Update PlayerPrefs with quantity
             string purchasedItems = PlayerPrefs.GetString("PurchasedItems", "");
             Dictionary<string, int> eggQuantities = ParsePurchasedItems(purchasedItems);
             
@@ -85,7 +81,6 @@ public class EggShopManager : MonoBehaviour
                 eggQuantities[eggTitle] = 1;
             }
 
-            // Save updated quantities back to PlayerPrefs
             string updatedPurchasedItems = string.Join(",", eggQuantities.Select(kvp => $"{kvp.Key}:{kvp.Value}")) + ",";
             PlayerPrefs.SetString("PurchasedItems", updatedPurchasedItems);
             PlayerPrefs.Save();
@@ -125,6 +120,17 @@ public class EggShopManager : MonoBehaviour
             shopPanels[i].descriptionTXT.text = shopDatabase.shopItemsSO[i].description;
             shopPanels[i].costTXT.text = "Coins: " + shopDatabase.shopItemsSO[i].baseCost.ToString();
             
+            // Display possible animals
+            string animalsList = "\nPossible Animals:\n";
+            foreach (var spawnChance in shopDatabase.shopItemsSO[i].animalSpawnChances)
+            {
+                if (spawnChance.animalPrefab != null)
+                {
+                    animalsList += $"{spawnChance.animalPrefab.name}: {spawnChance.spawnChance}%\n";
+                }
+            }
+            shopPanels[i].descriptionTXT.text += animalsList;
+
             if (shopPanels[i].itemImage != null && shopDatabase.shopItemsSO[i].itemPrefab != null)
             {
                 Image prefabImage = shopDatabase.shopItemsSO[i].itemPrefab.GetComponent<Image>();

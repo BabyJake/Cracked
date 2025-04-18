@@ -16,3 +16,7 @@ MonoBehaviour:
   description: 
   baseCost: 10
   itemPrefab: {fileID: 2686783879321805481, guid: 112108a49cb70a44dbeeb5356c82eb3b, type: 3}
+  itemImage: {fileID: 0}
+  animalSpawnChances:
+  - animalPrefab: {fileID: 1943816423111845045, guid: 2816340e3a19ff044afa520351032dca, type: 3}
+    spawnChance: 100
