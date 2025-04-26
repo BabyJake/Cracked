@@ -22,11 +22,15 @@ public class CircularTimer : MonoBehaviour, IPointerDownHandler, IDragHandler, I
     public float currentMinutes = 0f; // Current selected time
 
     private RectTransform dialRect;
+    private SimpleTimer simpleTimer;
 
     void Start()
     {
         // Get the RectTransform of the dialImage
         dialRect = dialImage.GetComponent<RectTransform>();
+        
+        // Get reference to SimpleTimer
+        simpleTimer = FindObjectOfType<SimpleTimer>();
 
         // Initialize the dial (0 fill amount means 0 minutes)
         dialImage.fillAmount = 0f;
@@ -37,20 +41,32 @@ public class CircularTimer : MonoBehaviour, IPointerDownHandler, IDragHandler, I
     // Called when the user touches down on the dial
     public void OnPointerDown(PointerEventData eventData)
     {
-        UpdateDial(eventData);
+        // Only update dial if not interacting with egg
+        if (simpleTimer == null || !simpleTimer.isInteractingWithEgg)
+        {
+            UpdateDial(eventData);
+        }
     }
 
     // Called when the user drags on the dial
     public void OnDrag(PointerEventData eventData)
     {
-        UpdateDial(eventData);
+        // Only update dial if not interacting with egg
+        if (simpleTimer == null || !simpleTimer.isInteractingWithEgg)
+        {
+            UpdateDial(eventData);
+        }
     }
 
     // Called when the user lifts their finger (optional, if you want to trigger an action)
     public void OnPointerUp(PointerEventData eventData)
     {
-        // You could trigger your timer to start here, for example:
-        // SimpleTimerInstance.StartTimerWithMinutes(currentMinutes);
+        // Only update dial if not interacting with egg
+        if (simpleTimer == null || !simpleTimer.isInteractingWithEgg)
+        {
+            // You could trigger your timer to start here, for example:
+            // SimpleTimerInstance.StartTimerWithMinutes(currentMinutes);
+        }
     }
 
     // Update the dial fill amount based on the pointer position

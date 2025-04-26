@@ -137,31 +137,42 @@ public class PurchasedEggManager : MonoBehaviour
             Image buttonImage = eggButton.GetComponent<Image>();
             if (buttonImage != null && egg.Value.itemPrefab != null)
             {
+                // Default color in case no source is found
+                Color targetColor = Color.white;
+
+                // Check for Image component on itemPrefab
                 Image prefabImage = egg.Value.itemPrefab.GetComponent<Image>();
                 if (prefabImage != null && prefabImage.sprite != null)
                 {
                     buttonImage.sprite = prefabImage.sprite;
+                    targetColor = prefabImage.color; // Copy the color
                 }
                 else
                 {
+                    // Check for SpriteRenderer on itemPrefab
                     SpriteRenderer prefabSprite = egg.Value.itemPrefab.GetComponent<SpriteRenderer>();
                     if (prefabSprite != null && prefabSprite.sprite != null)
                     {
                         buttonImage.sprite = prefabSprite.sprite;
+                        targetColor = prefabSprite.color; // Copy the color
                     }
                     else
                     {
+                        // Check for Image in children
                         Image childImage = egg.Value.itemPrefab.GetComponentInChildren<Image>();
                         if (childImage != null && childImage.sprite != null)
                         {
                             buttonImage.sprite = childImage.sprite;
+                            targetColor = childImage.color; // Copy the color
                         }
                         else
                         {
+                            // Check for SpriteRenderer in children
                             SpriteRenderer childSprite = egg.Value.itemPrefab.GetComponentInChildren<SpriteRenderer>();
                             if (childSprite != null && childSprite.sprite != null)
                             {
                                 buttonImage.sprite = childSprite.sprite;
+                                targetColor = childSprite.color; // Copy the color
                             }
                             else
                             {
@@ -170,6 +181,10 @@ public class PurchasedEggManager : MonoBehaviour
                         }
                     }
                 }
+
+                // Apply the color to the button's Image component
+                buttonImage.color = targetColor;
+                Debug.Log($"Assigned color {targetColor} to egg button: {egg.Key}");
             }
             
             Button button = eggButton.GetComponent<Button>();

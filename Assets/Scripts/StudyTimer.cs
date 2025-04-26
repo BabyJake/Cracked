@@ -4,8 +4,10 @@ using UnityEngine.SceneManagement;
 using UnityEngine.UI;
 using TMPro;
 using System.Linq;
+using DG.Tweening;
 public class SimpleTimer : MonoBehaviour
 {
+    
     public TMP_Text timerText;
     public TMP_Text coinText;
     public GameObject eggPrefab;
@@ -17,6 +19,7 @@ public class SimpleTimer : MonoBehaviour
     public TMP_Text timerButtonLabel;
     public GameObject menu;
     public GameObject eggMenu;
+    private BottomMenuSlide eggMenuSlide;
     
     public GameObject giveUpPopup;
     public Button yesButton;
@@ -24,6 +27,7 @@ public class SimpleTimer : MonoBehaviour
 
     private float timeRemaining;
     public bool isTimerRunning { get; private set; }
+    public bool isInteractingWithEgg { get; private set; } = false;
     private bool sessionFailed = false;
     private bool isProcessingGiveUp = false;
     private bool hasCreatedGraveThisSession = false;
@@ -53,6 +57,14 @@ public class SimpleTimer : MonoBehaviour
     void Awake()
     {
         currentEggPrefab = eggPrefab;
+        if (eggMenu != null)
+        {
+        eggMenuSlide = eggMenu.GetComponent<BottomMenuSlide>();
+        if (eggMenuSlide == null)
+        {
+            Debug.LogError("BottomMenuSlide component missing on eggMenu!");
+        }
+}
     }
 
     void Start()
@@ -74,7 +86,10 @@ public class SimpleTimer : MonoBehaviour
         }
 
         SpawnEgg();
-        if (eggMenu != null) eggMenu.SetActive(false);
+        if (eggMenu != null && eggMenuSlide != null)
+        {
+            eggMenuSlide.HideInstant(); // Ensure menu is hidden initially
+        }
         if (unlockPopup != null) unlockPopup.SetActive(false);
 
         if (giveUpPopup != null) giveUpPopup.SetActive(false);
@@ -174,20 +189,27 @@ public class SimpleTimer : MonoBehaviour
             }
         }
 
-        if (Input.GetMouseButtonDown(0) && currentEgg != null)
+        if (Input.GetMouseButtonDown(0) && currentEgg != null && !isTimerRunning)
         {
             Vector2 tapPosition = Camera.main.ScreenToWorldPoint(Input.mousePosition);
             RaycastHit2D hit = Physics2D.Raycast(tapPosition, Vector2.zero);
 
             if (hit.collider != null && hit.collider.gameObject == currentEgg && !eggMenu.activeSelf)
             {
-                eggMenu.SetActive(true);
-                Debug.Log("Egg menu opened");
+                isInteractingWithEgg = true;
+                eggMenuSlide.SlideIn();
+                Debug.Log("Egg menu sliding in");
             }
             else if (eggMenu.activeSelf && !IsTapOnMenu(tapPosition))
             {
-                eggMenu.SetActive(false);
-                Debug.Log("Egg menu closed by tapping outside");
+                if (eggMenuSlide != null)
+                {
+                    eggMenuSlide.SlideOut().OnComplete(() => {
+                    eggMenu.SetActive(false);
+                    isInteractingWithEgg = false;
+                    Debug.Log("Egg menu sliding out");
+                });
+                }
             }
         }
     }
@@ -240,7 +262,18 @@ public class SimpleTimer : MonoBehaviour
             Destroy(currentEgg);
             Debug.Log("Egg hatched! You earned a new animal.");
             SpawnRandomAnimal();
-            eggMenu.SetActive(false);
+            if (eggMenuSlide != null)
+            {
+                eggMenuSlide.SlideOut().OnComplete(() => {
+                eggMenu.SetActive(false);
+                isInteractingWithEgg = false;
+                });
+            }
+            else
+            {
+                eggMenu.SetActive(false);
+                isInteractingWithEgg = false;
+            }
         }
     }
 
@@ -375,6 +408,7 @@ public class SimpleTimer : MonoBehaviour
     {
         timerButtonLabel.text = "Start Timer";
         eggMenu.SetActive(false);
+        isInteractingWithEgg = false;
         Disc.SetActive(true);
         Disc2.SetActive(true);
         menu.SetActive(true);
@@ -406,6 +440,7 @@ public class SimpleTimer : MonoBehaviour
     {
         isTimerRunning = false;
         timeRemaining = 0;
+        isInteractingWithEgg = false;
 
         if (circularTimer != null)
         {
@@ -470,16 +505,22 @@ public class SimpleTimer : MonoBehaviour
     {
         if (!hasFocus && isTimerRunning && !isProcessingGiveUp)
         {
+            // Only apply penalty when losing focus (switching apps)
             ApplyPenalty();
         }
     }
 
     void OnApplicationPause(bool isPaused)
     {
-        if (isPaused && isTimerRunning && !isProcessingGiveUp)
-        {
-            ApplyPenalty();
-        }
+        // Don't do anything on pause - this covers standby/sleep mode
+        // The timer will continue running in the background
+    }
+
+    void OnApplicationQuit()
+    {
+        // Don't apply penalty when app is actually quitting
+        // This would cover cases like phone power off
+        Debug.Log("Application quitting - timer state preserved");
     }
 
     void ApplyPenalty()
@@ -489,27 +530,35 @@ public class SimpleTimer : MonoBehaviour
 
         if (isTimerRunning)
         {
-            lastCoinsEarned = AwardCoinsForSession(false);
-        }
-
-        isTimerRunning = false;
-        timeRemaining = 0;
-
-        if (currentEgg != null)
-        {
-            Destroy(currentEgg);
-            Debug.Log("Egg destroyed due to distraction.");
-
-            if (!hasCreatedGraveThisSession)
+            if (giveUpPopup != null)
             {
-                string graveId = AddGraveToUnlockedList();
-                Debug.Log($"Created penalty grave with ID {graveId}");
-                hasCreatedGraveThisSession = true;
+                giveUpPopup.SetActive(true);
+            }
+            else
+            {
+                // Fallback to direct penalty if popup is not available
+                lastCoinsEarned = AwardCoinsForSession(false);
+                isTimerRunning = false;
+                timeRemaining = 0;
+
+                if (currentEgg != null)
+                {
+                    Destroy(currentEgg);
+                    Debug.Log("Egg destroyed due to distraction.");
+
+                    if (!hasCreatedGraveThisSession)
+                    {
+                        string graveId = AddGraveToUnlockedList();
+                        Debug.Log($"Created penalty grave with ID {graveId}");
+                        hasCreatedGraveThisSession = true;
+                    }
+                }
+                eggMenu.SetActive(false);
+                isInteractingWithEgg = false;
+
+                ResetToDefaultState();
             }
         }
-        eggMenu.SetActive(false);
-
-        ResetToDefaultState();
         isProcessingGiveUp = false;
     }
 
