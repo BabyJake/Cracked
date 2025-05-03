@@ -15,3 +15,4 @@ MonoBehaviour:
   shopItemsSO:
   - {fileID: 11400000, guid: 614f9dc3915425f44be7274a42479e0b, type: 2}
   - {fileID: 11400000, guid: 7bf861107cd4b714a881b5d4ecf92dac, type: 2}
+  - {fileID: 11400000, guid: 7470c809b0c847a4484366071a5e93ef, type: 2}

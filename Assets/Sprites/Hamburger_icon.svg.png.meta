@@ -210,7 +210,10 @@ TextureImporter:
     secondaryTextures: []
     spriteCustomMetadata:
       entries: []
-    nameFileIdTable: {}
+    nameFileIdTable:
+      Hamburger_icon.svg_0: 3083051026034706749
+      Hamburger_icon.svg_1: -1646832639311765567
+      Hamburger_icon.svg_2: 6396012233993579631
   mipmapLimitGroupName: 
   pSDRemoveMatte: 0
   userData: 
