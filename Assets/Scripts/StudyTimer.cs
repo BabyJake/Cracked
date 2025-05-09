@@ -22,6 +22,9 @@ public class SimpleTimer : MonoBehaviour
     public GameObject eggMenu;
     private BottomMenuSlide eggMenuSlide;
 
+    [Header("Animal Settings")]
+    public float animalHatchScale = 2f; // Adjust this in the Unity Inspector
+
     public GameObject giveUpPopup;
     public Button yesButton;
     public Button noButton;
@@ -70,6 +73,7 @@ public class SimpleTimer : MonoBehaviour
 
     void Start()
     {
+        //PlayerPrefs.DeleteAll();
         sessionFailed = false;
         timerButtonLabel.text = "Start Timer";
 
@@ -125,13 +129,11 @@ public class SimpleTimer : MonoBehaviour
         if (currentEggPrefab != null)
         {
             currentEgg = Instantiate(currentEggPrefab, eggPosition, Quaternion.identity);
-            Debug.Log($"Egg spawned at: {eggPosition} using prefab: {currentEggPrefab.name}");
         }
         else if (eggPrefab != null)
         {
             currentEgg = Instantiate(eggPrefab, eggPosition, Quaternion.identity);
             currentEggSO = null;
-            Debug.Log($"Egg spawned using default prefab at: {eggPosition}");
         }
         else
         {
@@ -179,7 +181,6 @@ public class SimpleTimer : MonoBehaviour
             {
                 isTimerRunning = false;
                 timeRemaining = 0;
-                Debug.Log("Timer complete! Egg hatched!");
                 lastCoinsEarned = AwardCoinsForSession(true);
                 HatchEgg();
                 timerButtonLabel.text = "Start Timer";
@@ -195,13 +196,13 @@ public class SimpleTimer : MonoBehaviour
             {
                 isInteractingWithEgg = true;
                 eggMenuSlide.SlideIn();
-                Debug.Log("Egg menu sliding in");
             }
             else if (eggMenu.activeSelf && !IsTapOnMenu(tapPosition))
             {
                 if (eggMenuSlide != null)
                 {
-                    eggMenuSlide.SlideOut().OnComplete(() => {
+                    eggMenuSlide.SlideOut().OnComplete(() =>
+                    {
                         eggMenu.SetActive(false);
                         isInteractingWithEgg = false;
                     });
@@ -221,7 +222,6 @@ public class SimpleTimer : MonoBehaviour
         {
             TotalCoins += coinsEarned;
             UpdateCoinDisplay();
-            Debug.Log($"Awarded {coinsEarned} coins. Total: {TotalCoins}");
         }
         return coinsEarned;
     }
@@ -256,7 +256,8 @@ public class SimpleTimer : MonoBehaviour
             SpawnRandomAnimal();
             if (eggMenuSlide != null)
             {
-                eggMenuSlide.SlideOut().OnComplete(() => {
+                eggMenuSlide.SlideOut().OnComplete(() =>
+                {
                     eggMenu.SetActive(false);
                     isInteractingWithEgg = false;
                 });
@@ -271,8 +272,66 @@ public class SimpleTimer : MonoBehaviour
 
     void SpawnRandomAnimal()
     {
-        // [Same as before — omitted for brevity]
-        // Handles random spawn and popup UI
+        if (currentEggSO != null && currentEggSO.animalSpawnChances.Count > 0 && spawnPoint != null)
+        {
+            // Calculate total spawn chance
+            float totalChance = 0f;
+            foreach (var animalChance in currentEggSO.animalSpawnChances)
+            {
+                totalChance += animalChance.spawnChance;
+            }
+
+            // Generate random value between 0 and total chance
+            float randomValue = Random.Range(0f, totalChance);
+            float currentChance = 0f;
+
+            // Find the selected animal based on spawn chances
+            GameObject selectedAnimal = null;
+            foreach (var animalChance in currentEggSO.animalSpawnChances)
+            {
+                currentChance += animalChance.spawnChance;
+                if (randomValue <= currentChance)
+                {
+                    selectedAnimal = animalChance.animalPrefab;
+                    break;
+                }
+            }
+
+            if (selectedAnimal != null)
+            {
+                currentAnimal = Instantiate(selectedAnimal, spawnPoint.position, Quaternion.identity);
+                // Scale up the animal for the hatching scene using the public variable
+                currentAnimal.transform.localScale = new Vector3(animalHatchScale, animalHatchScale, animalHatchScale);
+                string animalName = selectedAnimal.name.Replace("(Clone)", "").Trim();
+                animalNameText.text = animalName;
+                unlockCoinRewardText.text = $"+{lastCoinsEarned}";
+                unlockPopup.SetActive(true);
+                UnlockAnimal(animalName);
+                
+                // Store the animal name for the grid manager
+                PlayerPrefs.SetString("PendingAnimal", animalName);
+                PlayerPrefs.Save();
+                Debug.Log($"Spawned animal: {animalName} and stored as pending");
+            }
+        }
+        else if (animalPrefabs.Count > 0 && spawnPoint != null)
+        {
+            // Fallback to random selection if no spawn chances are defined
+            GameObject randomAnimal = animalPrefabs[Random.Range(0, animalPrefabs.Count)];
+            currentAnimal = Instantiate(randomAnimal, spawnPoint.position, Quaternion.identity);
+            // Scale up the animal for the hatching scene using the public variable
+            currentAnimal.transform.localScale = new Vector3(animalHatchScale, animalHatchScale, animalHatchScale);
+            string animalName = randomAnimal.name.Replace("(Clone)", "").Trim();
+            animalNameText.text = animalName;
+            unlockCoinRewardText.text = $"+{lastCoinsEarned}";
+            unlockPopup.SetActive(true);
+            UnlockAnimal(animalName);
+            
+            // Store the animal name for the grid manager
+            PlayerPrefs.SetString("PendingAnimal", animalName);
+            PlayerPrefs.Save();
+            Debug.Log($"Spawned random animal: {animalName} and stored as pending");
+        }
     }
 
     void UnlockAnimal(string animalName)
@@ -283,11 +342,6 @@ public class SimpleTimer : MonoBehaviour
             existingAnimals += animalName + ",";
             PlayerPrefs.SetString("UnlockedAnimals", existingAnimals);
             PlayerPrefs.Save();
-            Debug.Log($"Unlocked: {animalName}");
-        }
-        else
-        {
-            Debug.Log($"Animal already unlocked: {animalName}");
         }
     }
 
@@ -304,17 +358,16 @@ public class SimpleTimer : MonoBehaviour
         isTimerRunning = false;
         timeRemaining = 0;
 
-        if (currentEgg != null)
+        GameObject eggClone = GameObject.Find("egg_0(Clone)");
+        if (eggClone != null)
         {
-            currentEgg.SetActive(false);
-            Debug.Log("Egg deactivated by Give Up action.");
+            eggClone.SetActive(false);
+        }
 
-            if (!hasCreatedGraveThisSession)
-            {
-                string graveId = AddGraveToUnlockedList();
-                Debug.Log($"Created grave with ID {graveId}");
-                hasCreatedGraveThisSession = true;
-            }
+        if (!hasCreatedGraveThisSession)
+        {
+            string graveId = AddGraveToUnlockedList();
+            hasCreatedGraveThisSession = true;
         }
 
         if (deathPopup != null)
@@ -335,7 +388,7 @@ public class SimpleTimer : MonoBehaviour
         Disc2.SetActive(true);
         menu.SetActive(true);
         UpdateTimerDisplay();
-        
+
         if (currentEgg != null)
         {
             currentEgg.SetActive(true);
@@ -362,7 +415,6 @@ public class SimpleTimer : MonoBehaviour
         PlayerPrefs.SetString("UnlockedGraves", existingGraves);
         PlayerPrefs.SetString(graveId + "_date", System.DateTime.Today.ToString("yyyy-MM-dd"));
         PlayerPrefs.Save();
-        Debug.Log($"Added grave with ID {graveId} to persistent storage");
         return graveId;
     }
 
@@ -428,15 +480,16 @@ public class SimpleTimer : MonoBehaviour
         return false;
     }
 
-    void OnApplicationFocus(bool hasFocus)
+    // This is called only from native iOS code when app is truly backgrounded
+    public void OnAppTrueBackgrounded()
     {
-        if (!hasFocus && isTimerRunning && !isProcessingGiveUp)
+        if (isTimerRunning && !isProcessingGiveUp)
         {
             ApplyPenalty();
         }
     }
 
-    void ApplyPenalty()
+    private void ApplyPenalty()
     {
         if (isProcessingGiveUp) return;
         isProcessingGiveUp = true;
@@ -450,12 +503,9 @@ public class SimpleTimer : MonoBehaviour
             if (currentEgg != null)
             {
                 currentEgg.SetActive(false);
-                Debug.Log("Egg deactivated due to distraction.");
-
                 if (!hasCreatedGraveThisSession)
                 {
                     string graveId = AddGraveToUnlockedList();
-                    Debug.Log($"Created penalty grave with ID {graveId}");
                     hasCreatedGraveThisSession = true;
                 }
             }
@@ -469,16 +519,14 @@ public class SimpleTimer : MonoBehaviour
         isProcessingGiveUp = false;
     }
 
-    void OnApplicationPause(bool isPaused) { }
-
-    void OnApplicationQuit()
-    {
-        Debug.Log("Application quitting - timer state preserved");
-    }
-
     void OnDestroy()
     {
         if (yesButton != null) yesButton.onClick.RemoveListener(OnYesClicked);
         if (noButton != null) noButton.onClick.RemoveListener(OnNoClicked);
+    }
+
+    public void OK()
+    {
+        deathPopup.SetActive(false);
     }
 }
