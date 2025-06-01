@@ -251,6 +251,22 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 2660843255731245235}
     m_Modifications:
+    - target: {fileID: 295936787569027391, guid: b6e4c133ea230c744a4bafd3585f01c2, type: 3}
+      propertyPath: m_Colors.m_NormalColor.a
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 295936787569027391, guid: b6e4c133ea230c744a4bafd3585f01c2, type: 3}
+      propertyPath: m_Colors.m_NormalColor.b
+      value: 0.27144888
+      objectReference: {fileID: 0}
+    - target: {fileID: 295936787569027391, guid: b6e4c133ea230c744a4bafd3585f01c2, type: 3}
+      propertyPath: m_Colors.m_NormalColor.g
+      value: 0.27144888
+      objectReference: {fileID: 0}
+    - target: {fileID: 295936787569027391, guid: b6e4c133ea230c744a4bafd3585f01c2, type: 3}
+      propertyPath: m_Colors.m_NormalColor.r
+      value: 0.9433962
+      objectReference: {fileID: 0}
     - target: {fileID: 1735439354757999762, guid: b6e4c133ea230c744a4bafd3585f01c2, type: 3}
       propertyPath: m_Name
       value: ItemTemplate

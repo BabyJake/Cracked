@@ -30,7 +30,7 @@ public class CircularTimer : MonoBehaviour, IPointerDownHandler, IDragHandler, I
         dialRect = dialImage.GetComponent<RectTransform>();
         
         // Get reference to SimpleTimer
-        simpleTimer = FindObjectOfType<SimpleTimer>();
+        simpleTimer = Object.FindAnyObjectByType<SimpleTimer>();
 
         // Initialize the dial (0 fill amount means 0 minutes)
         dialImage.fillAmount = 0f;
