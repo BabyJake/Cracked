@@ -48,6 +48,10 @@ public class SimpleTimer : MonoBehaviour
 
     public CircularTimer circularTimer;
 
+    private float savedTimeRemaining;
+    private float savedSessionStartTime;
+    private bool wasTimerRunning;
+
     public static int TotalCoins
     {
         get { return PlayerPrefs.GetInt("TotalCoins", 0); }
@@ -98,6 +102,7 @@ public class SimpleTimer : MonoBehaviour
         if (noButton != null) noButton.onClick.AddListener(OnNoClicked);
 
         UpdateCoinDisplay();
+        RestoreTimerState();
     }
 
     public void ChangeEggPrefab(GameObject newEggPrefab, ShopItemSO eggSO)
@@ -480,11 +485,52 @@ public class SimpleTimer : MonoBehaviour
         return false;
     }
 
+    private void SaveTimerState()
+    {
+        savedTimeRemaining = timeRemaining;
+        savedSessionStartTime = sessionStartTime;
+        wasTimerRunning = isTimerRunning;
+        PlayerPrefs.SetFloat("SavedTimeRemaining", savedTimeRemaining);
+        PlayerPrefs.SetFloat("SavedSessionStartTime", savedSessionStartTime);
+        PlayerPrefs.SetInt("WasTimerRunning", wasTimerRunning ? 1 : 0);
+        PlayerPrefs.Save();
+    }
+
+    private void RestoreTimerState()
+    {
+        if (PlayerPrefs.HasKey("WasTimerRunning") && PlayerPrefs.GetInt("WasTimerRunning") == 1)
+        {
+            savedTimeRemaining = PlayerPrefs.GetFloat("SavedTimeRemaining");
+            savedSessionStartTime = PlayerPrefs.GetFloat("SavedSessionStartTime");
+            wasTimerRunning = true;
+            
+            // Calculate elapsed time while app was closed
+            float elapsedTime = Time.time - savedSessionStartTime;
+            timeRemaining = Mathf.Max(0, savedTimeRemaining - elapsedTime);
+            
+            if (timeRemaining > 0)
+            {
+                isTimerRunning = true;
+                sessionStartTime = Time.time;
+                timerButtonLabel.text = "Give Up";
+            }
+            else
+            {
+                isTimerRunning = false;
+                timeRemaining = 0;
+                lastCoinsEarned = AwardCoinsForSession(true);
+                HatchEgg();
+                timerButtonLabel.text = "Start Timer";
+            }
+        }
+    }
+
     // This is called only from native iOS code when app is truly backgrounded
     public void OnAppTrueBackgrounded()
     {
         if (isTimerRunning && !isProcessingGiveUp)
         {
+            SaveTimerState();
             ApplyPenalty();
         }
     }
