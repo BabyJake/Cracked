@@ -68,7 +68,11 @@ public class PurchasedEggManager : MonoBehaviour
             foreach (string eggEntry in purchasedEggs)
             {
                 string[] parts = eggEntry.Split(':');
-                if (parts.Length != 2 || !int.TryParse(parts[1], out int quantity)) continue;
+                if (parts.Length != 2 || !int.TryParse(parts[1], out int quantity)) 
+                {
+                    Debug.LogWarning($"Invalid egg entry format: {eggEntry}");
+                    continue;
+                }
                 
                 string eggName = parts[0];
                 Debug.Log("Processing egg: '" + eggName + "' with quantity: " + quantity);
