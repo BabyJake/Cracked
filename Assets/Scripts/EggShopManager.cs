@@ -29,6 +29,21 @@ public class EggShopManager : MonoBehaviour
         LoadPanels();
         CheckPurchaseable();
         CheckPanel();
+
+        // Subscribe to coin changes
+        SimpleTimer.OnCoinsChanged += OnCoinsChanged;
+    }
+
+    void OnDestroy()
+    {
+        // Unsubscribe from coin changes
+        SimpleTimer.OnCoinsChanged -= OnCoinsChanged;
+    }
+
+    private void OnCoinsChanged(int newAmount)
+    {
+        UpdateCoinDisplay();
+        CheckPurchaseable();
     }
 
     private int GetCoins()
@@ -38,7 +53,15 @@ public class EggShopManager : MonoBehaviour
 
     private void UpdateCoinDisplay()
     {
-        coinUI.text = "Coins: " + GetCoins().ToString();
+        if (coinUI == null)
+        {
+            Debug.LogError("coinUI is not assigned in EggShopManager!");
+            return;
+        }
+        
+        int coins = SimpleTimer.TotalCoins;
+        coinUI.text = "Coins: " + coins.ToString();
+        Debug.Log($"Updated coin display to: {coins}");
     }
 
     public void CheckPurchaseable()
@@ -63,6 +86,7 @@ public class EggShopManager : MonoBehaviour
             string eggTitle = shopDatabase.shopItemsSO[btnNo].title;
             Debug.Log($"Purchased {eggTitle} for {itemCost} coins");
 
+            // Update UI immediately after purchase
             UpdateCoinDisplay();
             CheckPurchaseable();
 
@@ -78,6 +102,12 @@ public class EggShopManager : MonoBehaviour
             PlayerPrefs.SetString("PurchasedItems", updatedPurchasedItems);
             PlayerPrefs.Save();
             Debug.Log($"Updated PurchasedItems: {updatedPurchasedItems}");
+
+            // Force UI update
+            if (coinUI != null)
+            {
+                coinUI.text = "Coins: " + SimpleTimer.TotalCoins.ToString();
+            }
         }
         else
         {

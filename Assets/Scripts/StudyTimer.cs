@@ -52,13 +52,25 @@ public class SimpleTimer : MonoBehaviour
     private float savedSessionStartTime;
     private bool wasTimerRunning;
 
+    public static event System.Action<int> OnCoinsChanged;
+    private static int _totalCoins = -1; // Cache for the total coins
     public static int TotalCoins
     {
-        get { return PlayerPrefs.GetInt("TotalCoins", 0); }
+        get 
+        { 
+            if (_totalCoins == -1)
+            {
+                _totalCoins = PlayerPrefs.GetInt("TotalCoins", 0);
+            }
+            return _totalCoins;
+        }
         set
         {
+            _totalCoins = value;
             PlayerPrefs.SetInt("TotalCoins", value);
             PlayerPrefs.Save();
+            Debug.Log($"TotalCoins updated to: {value}");
+            OnCoinsChanged?.Invoke(value);
         }
     }
 
@@ -477,11 +489,15 @@ public class SimpleTimer : MonoBehaviour
 
     public static bool SpendCoins(int amount)
     {
+        Debug.Log($"Attempting to spend {amount} coins. Current total: {TotalCoins}");
         if (TotalCoins >= amount)
         {
-            TotalCoins -= amount;
+            int newTotal = TotalCoins - amount;
+            TotalCoins = newTotal; // This will trigger the setter and save to PlayerPrefs
+            Debug.Log($"Spent {amount} coins. New total: {TotalCoins}");
             return true;
         }
+        Debug.Log($"Not enough coins. Required: {amount}, Available: {TotalCoins}");
         return false;
     }
 
