@@ -31,13 +31,13 @@ public class EggShopManager : MonoBehaviour
         CheckPanel();
 
         // Subscribe to coin changes
-        SimpleTimer.OnCoinsChanged += OnCoinsChanged;
+        StudyTimer.OnCoinsChanged += OnCoinsChanged;
     }
 
     void OnDestroy()
     {
         // Unsubscribe from coin changes
-        SimpleTimer.OnCoinsChanged -= OnCoinsChanged;
+        StudyTimer.OnCoinsChanged -= OnCoinsChanged;
     }
 
     private void OnCoinsChanged(int newAmount)
@@ -48,7 +48,7 @@ public class EggShopManager : MonoBehaviour
 
     private int GetCoins()
     {
-        return SimpleTimer.TotalCoins;
+        return StudyTimer.TotalCoins;
     }
 
     private void UpdateCoinDisplay()
@@ -59,7 +59,7 @@ public class EggShopManager : MonoBehaviour
             return;
         }
         
-        int coins = SimpleTimer.TotalCoins;
+        int coins = StudyTimer.TotalCoins;
         coinUI.text = "Coins: " + coins.ToString();
         Debug.Log($"Updated coin display to: {coins}");
     }
@@ -81,7 +81,7 @@ public class EggShopManager : MonoBehaviour
 
         int itemCost = shopDatabase.shopItemsSO[btnNo].baseCost;
 
-        if (SimpleTimer.SpendCoins(itemCost))
+        if (StudyTimer.SpendCoins(itemCost))
         {
             string eggTitle = shopDatabase.shopItemsSO[btnNo].title;
             Debug.Log($"Purchased {eggTitle} for {itemCost} coins");
@@ -106,7 +106,7 @@ public class EggShopManager : MonoBehaviour
             // Force UI update
             if (coinUI != null)
             {
-                coinUI.text = "Coins: " + SimpleTimer.TotalCoins.ToString();
+                coinUI.text = "Coins: " + StudyTimer.TotalCoins.ToString();
             }
         }
         else
@@ -215,7 +215,7 @@ public class EggShopManager : MonoBehaviour
 
     public void AddTestCoins(int amount)
     {
-        SimpleTimer.TotalCoins += amount;
+        StudyTimer.TotalCoins += amount;
         UpdateCoinDisplay();
         CheckPurchaseable();
     }

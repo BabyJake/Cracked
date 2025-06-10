@@ -6,7 +6,7 @@ using TMPro;
 using System.Linq;
 using DG.Tweening;
 
-public class SimpleTimer : MonoBehaviour
+public class StudyTimer : MonoBehaviour
 {
     public TMP_Text timerText;
     public TMP_Text coinText;
@@ -41,7 +41,7 @@ public class SimpleTimer : MonoBehaviour
 
     public List<GameObject> animalPrefabs;
     public Transform spawnPoint;
-    private GameObject currentEgg;
+    public GameObject currentEgg;
     private GameObject currentAnimal;
     private GameObject currentEggPrefab;
     private ShopItemSO currentEggSO;
@@ -431,6 +431,17 @@ public class SimpleTimer : MonoBehaviour
         existingGraves += string.IsNullOrEmpty(existingGraves) ? graveId : "," + graveId;
         PlayerPrefs.SetString("UnlockedGraves", existingGraves);
         PlayerPrefs.SetString(graveId + "_date", System.DateTime.Today.ToString("yyyy-MM-dd"));
+        
+        // Store the egg type with the grave
+        if (currentEggSO != null)
+        {
+            PlayerPrefs.SetString(graveId + "_eggType", currentEggSO.title);
+        }
+        else
+        {
+            PlayerPrefs.SetString(graveId + "_eggType", "CommonEgg"); // Default to common egg if no egg type is set
+        }
+        
         PlayerPrefs.Save();
         return graveId;
     }

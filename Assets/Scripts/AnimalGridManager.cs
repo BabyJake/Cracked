@@ -232,6 +232,20 @@ public class AnimalGridManager : MonoBehaviour
 
         if (placed)
         {
+            // Get the egg type for this grave
+            string eggType = PlayerPrefs.GetString(graveId + "_eggType", "CommonEgg");
+            
+            // Set the grave color based on egg type
+            SpriteRenderer graveRenderer = spawnedGrave.GetComponent<SpriteRenderer>();
+            if (graveRenderer != null)
+            {
+                if (eggType == "RareEgg")
+                {
+                    graveRenderer.color = new Color(0.3411765f, 0.8175273f, 1f, 1f); // Blue color for rare egg
+                }
+                // For common eggs, we'll use the default color (white)
+            }
+
             animalInstances.Add(new AnimalInstance
             {
                 animalObject = spawnedGrave,
@@ -241,7 +255,7 @@ public class AnimalGridManager : MonoBehaviour
                 isGrave = true,
                 id = graveId
             });
-            Debug.Log($"Placed grave {graveId} at {placedPosition}");
+            Debug.Log($"Placed grave {graveId} at {placedPosition} with egg type {eggType}");
         }
         else
         {

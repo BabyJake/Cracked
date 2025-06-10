@@ -6,7 +6,7 @@ using TMPro;
 public class PurchasedEggManager : MonoBehaviour
 {
     public ShopDatabase shopDatabase;
-    public SimpleTimer simpleTimer;
+    public StudyTimer simpleTimer;
     public GameObject eggMenuContent;
     public GameObject eggButtonPrefab;
     public ShopItemSO defaultEggSO;

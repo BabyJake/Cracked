@@ -22,15 +22,15 @@ public class CircularTimer : MonoBehaviour, IPointerDownHandler, IDragHandler, I
     public float currentMinutes = 0f; // Current selected time
 
     private RectTransform dialRect;
-    private SimpleTimer simpleTimer;
+    private StudyTimer simpleTimer;
 
     void Start()
     {
         // Get the RectTransform of the dialImage
         dialRect = dialImage.GetComponent<RectTransform>();
         
-        // Get reference to SimpleTimer
-        simpleTimer = Object.FindAnyObjectByType<SimpleTimer>();
+        // Get reference to StudyTimer
+        simpleTimer = Object.FindAnyObjectByType<StudyTimer>();
 
         // Initialize the dial (0 fill amount means 0 minutes)
         dialImage.fillAmount = 0f;
