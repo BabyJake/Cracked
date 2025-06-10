@@ -436,6 +436,41 @@ public class StudyTimer : MonoBehaviour
         if (currentEggSO != null)
         {
             PlayerPrefs.SetString(graveId + "_eggType", currentEggSO.title);
+            
+            // Get the egg's color from its SpriteRenderer or Image component
+            Color eggColor = Color.white;
+            if (currentEgg != null)
+            {
+                SpriteRenderer eggRenderer = currentEgg.GetComponent<SpriteRenderer>();
+                if (eggRenderer != null)
+                {
+                    eggColor = eggRenderer.color;
+                }
+                else
+                {
+                    Image eggImage = currentEgg.GetComponent<Image>();
+                    if (eggImage != null)
+                    {
+                        eggColor = eggImage.color;
+                    }
+                }
+            }
+            
+            // Store the egg's color
+            PlayerPrefs.SetFloat(graveId + "_colorR", eggColor.r);
+            PlayerPrefs.SetFloat(graveId + "_colorG", eggColor.g);
+            PlayerPrefs.SetFloat(graveId + "_colorB", eggColor.b);
+            PlayerPrefs.SetFloat(graveId + "_colorA", eggColor.a);
+            
+            // Update the death popup grave color if it exists
+            if (deathPopup != null)
+            {
+                SpriteRenderer graveRenderer = deathPopup.GetComponentInChildren<SpriteRenderer>();
+                if (graveRenderer != null)
+                {
+                    graveRenderer.color = eggColor;
+                }
+            }
         }
         else
         {

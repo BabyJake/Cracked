@@ -28,6 +28,10 @@ public class AnimalGridManager : MonoBehaviour
 
     [Header("Isometric Settings")]
     public float animalYOffset = 0.1f;
+    public float padding = 1.5f; // Padding around the grid
+    public float minOrthographicSize = 5f; // Minimum camera size
+    public float maxOrthographicSize = 15f; // Maximum camera size
+    public float cameraAdjustSpeed = 2f; // Speed at which camera adjusts
 
     private int gridSize = 3;
     private const string PendingAnimalKey = "PendingAnimal";
@@ -36,6 +40,8 @@ public class AnimalGridManager : MonoBehaviour
     private List<AnimalInstance> animalInstances = new List<AnimalInstance>();
     private string currentView = "All";
     private const string NewlyHatchedAnimalsKey = "NewlyHatchedAnimals";
+    private Camera mainCamera;
+    private float targetOrthographicSize;
 
     [Serializable]
     public class DailyHatchCount
@@ -63,6 +69,14 @@ public class AnimalGridManager : MonoBehaviour
 
     void Start()
     {
+        mainCamera = Camera.main;
+        if (mainCamera == null)
+        {
+            Debug.LogError("Main camera not found!");
+            return;
+        }
+
+        targetOrthographicSize = mainCamera.orthographicSize;
         Debug.Log("Current date: " + DateTime.Today.ToString("yyyy-MM-dd"));
         hatchData = LoadHatchData();
 
@@ -91,11 +105,73 @@ public class AnimalGridManager : MonoBehaviour
         ProcessUnlockedAnimals();
         ProcessUnlockedGraves();
         UpdateGridVisibility();
+        AdjustCameraToFitAllObjects();
 
         if (dailyButton != null) dailyButton.onClick.AddListener(() => SetView("Day"));
         if (weeklyButton != null) weeklyButton.onClick.AddListener(() => SetView("Week"));
         if (monthlyButton != null) monthlyButton.onClick.AddListener(() => SetView("Month"));
         if (yearlyButton != null) yearlyButton.onClick.AddListener(() => SetView("Year"));
+    }
+
+    void Update()
+    {
+        // Smoothly adjust camera size
+        if (mainCamera != null && Mathf.Abs(mainCamera.orthographicSize - targetOrthographicSize) > 0.01f)
+        {
+            mainCamera.orthographicSize = Mathf.Lerp(mainCamera.orthographicSize, targetOrthographicSize, Time.deltaTime * cameraAdjustSpeed);
+        }
+    }
+
+    private void AdjustCameraToFitAllObjects()
+    {
+        if (mainCamera == null) return;
+
+        Bounds bounds = new Bounds();
+        bool hasBounds = false;
+
+        // Include all active animal instances
+        foreach (var instance in animalInstances)
+        {
+            if (instance.animalObject != null && instance.animalObject.activeSelf)
+            {
+                if (!hasBounds)
+                {
+                    bounds = new Bounds(instance.animalObject.transform.position, Vector3.zero);
+                    hasBounds = true;
+                }
+                else
+                {
+                    bounds.Encapsulate(instance.animalObject.transform.position);
+                }
+            }
+        }
+
+        // If no objects found, use grid bounds
+        if (!hasBounds)
+        {
+            int halfSize = gridSize / 2;
+            Vector3 minPos = tilemap.GetCellCenterWorld(new Vector3Int(-halfSize, -halfSize, 0));
+            Vector3 maxPos = tilemap.GetCellCenterWorld(new Vector3Int(halfSize - 1, halfSize - 1, 0));
+            bounds = new Bounds((minPos + maxPos) * 0.5f, maxPos - minPos);
+        }
+
+        // Add padding to bounds
+        bounds.Expand(padding);
+
+        // Calculate required orthographic size
+        float screenRatio = (float)Screen.width / Screen.height;
+        float targetSize = bounds.size.y * 0.5f;
+        float targetSizeX = bounds.size.x * 0.5f / screenRatio;
+        targetSize = Mathf.Max(targetSize, targetSizeX);
+
+        // Clamp the size between min and max values
+        targetOrthographicSize = Mathf.Clamp(targetSize, minOrthographicSize, maxOrthographicSize);
+    }
+
+    // Call this method whenever the grid changes
+    private void OnGridChanged()
+    {
+        AdjustCameraToFitAllObjects();
     }
 
     private void AddAnimalToNewlyHatchedList(string animalName)
@@ -198,6 +274,7 @@ public class AnimalGridManager : MonoBehaviour
                 id = animalName
             });
             Debug.Log($"Placed animal: {animalName} at {placedPosition}");
+            OnGridChanged();
         }
     }
 
@@ -256,6 +333,7 @@ public class AnimalGridManager : MonoBehaviour
                 id = graveId
             });
             Debug.Log($"Placed grave {graveId} at {placedPosition} with egg type {eggType}");
+            OnGridChanged();
         }
         else
         {
@@ -451,6 +529,7 @@ public class AnimalGridManager : MonoBehaviour
             };
             instance.animalObject.SetActive(shouldBeVisible);
         }
+        OnGridChanged();
     }
 
     private void SetView(string view)
