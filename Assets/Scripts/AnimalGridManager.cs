@@ -42,6 +42,9 @@ public class AnimalGridManager : MonoBehaviour
     private const string NewlyHatchedAnimalsKey = "NewlyHatchedAnimals";
     private Camera mainCamera;
     private float targetOrthographicSize;
+    
+    // Store original positions for "All" view restoration
+    private Dictionary<string, Vector3Int> originalPositions = new Dictionary<string, Vector3Int>();
 
     [Serializable]
     public class DailyHatchCount
@@ -264,7 +267,8 @@ public class AnimalGridManager : MonoBehaviour
         {
             string hatchDate = isNewlyHatched ? DateTime.Today.ToString("yyyy-MM-dd") : DateTime.Today.AddDays(-7).ToString("yyyy-MM-dd");
             if (isNewlyHatched) RecordHatching();
-            animalInstances.Add(new AnimalInstance
+            
+            var instance = new AnimalInstance
             {
                 animalObject = spawnedAnimal,
                 gridPosition = placedPosition,
@@ -272,7 +276,13 @@ public class AnimalGridManager : MonoBehaviour
                 isNewlyHatched = isNewlyHatched,
                 isGrave = false,
                 id = animalName
-            });
+            };
+            
+            animalInstances.Add(instance);
+            
+            // Store original position for restoration
+            originalPositions[GetInstanceKey(instance)] = placedPosition;
+            
             Debug.Log($"Placed animal: {animalName} at {placedPosition}");
             OnGridChanged();
         }
@@ -323,7 +333,7 @@ public class AnimalGridManager : MonoBehaviour
                 // For common eggs, we'll use the default color (white)
             }
 
-            animalInstances.Add(new AnimalInstance
+            var instance = new AnimalInstance
             {
                 animalObject = spawnedGrave,
                 gridPosition = placedPosition,
@@ -331,7 +341,13 @@ public class AnimalGridManager : MonoBehaviour
                 isNewlyHatched = false,
                 isGrave = true,
                 id = graveId
-            });
+            };
+            
+            animalInstances.Add(instance);
+            
+            // Store original position for restoration
+            originalPositions[GetInstanceKey(instance)] = placedPosition;
+            
             Debug.Log($"Placed grave {graveId} at {placedPosition} with egg type {eggType}");
             OnGridChanged();
         }
@@ -459,6 +475,11 @@ public class AnimalGridManager : MonoBehaviour
         return animalPrefabs.Find(prefab => prefab.name == animalName);
     }
 
+    private string GetInstanceKey(AnimalInstance instance)
+    {
+        return instance.id + (instance.isGrave ? "_grave" : "_animal");
+    }
+
     private void RecordHatching()
     {
         string today = DateTime.Today.ToString("yyyy-MM-dd");
@@ -515,9 +536,13 @@ public class AnimalGridManager : MonoBehaviour
     private void UpdateGridVisibility()
     {
         DateTime today = DateTime.Today;
+        List<AnimalInstance> visibleInstances = new List<AnimalInstance>();
+
+        // First pass: determine which instances should be visible
         foreach (var instance in animalInstances)
         {
             if (instance.animalObject == null) continue;
+            
             DateTime hatchDate = DateTime.Parse(instance.hatchDate);
             bool shouldBeVisible = currentView switch
             {
@@ -527,9 +552,135 @@ public class AnimalGridManager : MonoBehaviour
                 "Year" => hatchDate.Date >= today.AddDays(-364).Date && hatchDate.Date <= today.Date,
                 _ => true
             };
-            instance.animalObject.SetActive(shouldBeVisible);
+            
+            if (shouldBeVisible)
+            {
+                visibleInstances.Add(instance);
+            }
         }
+
+        if (currentView == "All")
+        {
+            // Restore all instances to their original positions
+            RestoreOriginalPositions();
+        }
+        else
+        {
+            // Reorganize visible instances in a filtered view
+            ReorganizeFilteredView(visibleInstances);
+        }
+
         OnGridChanged();
+    }
+
+    private void RestoreOriginalPositions()
+    {
+        // First deactivate all instances
+        foreach (var instance in animalInstances)
+        {
+            if (instance.animalObject != null)
+            {
+                instance.animalObject.SetActive(false);
+            }
+        }
+
+        // Clear and refill the grid to original size
+        tilemap.ClearAllTiles();
+        
+        // Calculate required grid size for all instances
+        int requiredSize = Mathf.CeilToInt(Mathf.Sqrt(animalInstances.Count));
+        gridSize = Mathf.Max(3, requiredSize + 1); // Add some extra space
+        FillGrid();
+
+        // Restore original positions and activate all instances
+        foreach (var instance in animalInstances)
+        {
+            if (instance.animalObject == null) continue;
+
+            string key = GetInstanceKey(instance);
+            if (originalPositions.ContainsKey(key))
+            {
+                Vector3Int originalPos = originalPositions[key];
+                Vector3 worldPos = tilemap.GetCellCenterWorld(originalPos);
+                worldPos.y += animalYOffset;
+                
+                instance.animalObject.transform.position = worldPos;
+                instance.gridPosition = originalPos;
+                
+                // Update sorting order
+                SpriteRenderer renderer = instance.animalObject.GetComponent<SpriteRenderer>();
+                if (renderer != null)
+                {
+                    renderer.sortingOrder = -originalPos.y;
+                }
+            }
+            
+            instance.animalObject.SetActive(true);
+        }
+    }
+
+    private void ReorganizeFilteredView(List<AnimalInstance> visibleInstances)
+    {
+        // First deactivate all instances
+        foreach (var instance in animalInstances)
+        {
+            if (instance.animalObject != null)
+            {
+                instance.animalObject.SetActive(false);
+            }
+        }
+
+        if (visibleInstances.Count == 0)
+        {
+            // If no visible instances, just clear the grid
+            tilemap.ClearAllTiles();
+            gridSize = 3;
+            FillGrid();
+            return;
+        }
+
+        // Calculate new grid size based on number of visible instances
+        int requiredSize = Mathf.CeilToInt(Mathf.Sqrt(visibleInstances.Count));
+        gridSize = Mathf.Max(3, requiredSize + 1); // Add some buffer space
+
+        // Clear and refill the grid
+        tilemap.ClearAllTiles();
+        FillGrid();
+
+        // Get all empty cells for placement
+        List<Vector3Int> emptyCells = GetEmptyCells();
+        
+        // Shuffle the empty cells for random placement
+        for (int i = 0; i < emptyCells.Count; i++)
+        {
+            Vector3Int temp = emptyCells[i];
+            int randomIndex = UnityEngine.Random.Range(i, emptyCells.Count);
+            emptyCells[i] = emptyCells[randomIndex];
+            emptyCells[randomIndex] = temp;
+        }
+
+        // Place visible instances randomly on empty cells
+        for (int i = 0; i < visibleInstances.Count && i < emptyCells.Count; i++)
+        {
+            var instance = visibleInstances[i];
+            Vector3Int newPos = emptyCells[i];
+            Vector3 worldPos = tilemap.GetCellCenterWorld(newPos);
+            worldPos.y += animalYOffset;
+            
+            // Update the instance's position
+            instance.animalObject.transform.position = worldPos;
+            instance.gridPosition = newPos;
+
+            // Update sorting order
+            SpriteRenderer renderer = instance.animalObject.GetComponent<SpriteRenderer>();
+            if (renderer != null)
+            {
+                renderer.sortingOrder = -newPos.y;
+            }
+            
+            // Activate the instance
+            instance.animalObject.SetActive(true);
+        }
     }
 
     private void SetView(string view)
@@ -537,6 +688,7 @@ public class AnimalGridManager : MonoBehaviour
         currentView = view;
         UpdateGridVisibility();
         SafeUpdateHatchCountUI();
+        Debug.Log($"View changed to: {view}");
     }
 }
 
