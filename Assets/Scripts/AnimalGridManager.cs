@@ -39,12 +39,15 @@ public class AnimalGridManager : MonoBehaviour
     private HatchData hatchData;
     private List<AnimalInstance> animalInstances = new List<AnimalInstance>();
     private string currentView = "All";
+    private string previousView = "All";
     private const string NewlyHatchedAnimalsKey = "NewlyHatchedAnimals";
     private Camera mainCamera;
     private float targetOrthographicSize;
     
     // Store original positions for "All" view restoration
     private Dictionary<string, Vector3Int> originalPositions = new Dictionary<string, Vector3Int>();
+    // Add dictionary to store view-specific positions
+    private Dictionary<string, Dictionary<string, Vector3Int>> viewPositions = new Dictionary<string, Dictionary<string, Vector3Int>>();
 
     [Serializable]
     public class DailyHatchCount
@@ -647,23 +650,57 @@ public class AnimalGridManager : MonoBehaviour
         tilemap.ClearAllTiles();
         FillGrid();
 
+        // Initialize view positions if not exists
+        if (!viewPositions.ContainsKey(currentView))
+        {
+            viewPositions[currentView] = new Dictionary<string, Vector3Int>();
+        }
+
         // Get all empty cells for placement
         List<Vector3Int> emptyCells = GetEmptyCells();
         
-        // Shuffle the empty cells for random placement
-        for (int i = 0; i < emptyCells.Count; i++)
+        // Sort empty cells by distance from center (closest first)
+        Vector3Int center = new Vector3Int(0, 0, 0);
+        emptyCells.Sort((a, b) => {
+            float distA = Vector3Int.Distance(a, center);
+            float distB = Vector3Int.Distance(b, center);
+            return distA.CompareTo(distB);
+        });
+
+        // Shuffle the empty cells while maintaining center preference
+        // We'll shuffle in groups to maintain some randomness while keeping center preference
+        int groupSize = Mathf.Max(1, emptyCells.Count / 4); // Divide cells into 4 groups
+        for (int i = 0; i < emptyCells.Count; i += groupSize)
         {
-            Vector3Int temp = emptyCells[i];
-            int randomIndex = UnityEngine.Random.Range(i, emptyCells.Count);
-            emptyCells[i] = emptyCells[randomIndex];
-            emptyCells[randomIndex] = temp;
+            int endIndex = Mathf.Min(i + groupSize, emptyCells.Count);
+            for (int j = i; j < endIndex; j++)
+            {
+                int randomIndex = UnityEngine.Random.Range(i, endIndex);
+                Vector3Int temp = emptyCells[j];
+                emptyCells[j] = emptyCells[randomIndex];
+                emptyCells[randomIndex] = temp;
+            }
         }
 
-        // Place visible instances randomly on empty cells
+        // Place visible instances
         for (int i = 0; i < visibleInstances.Count && i < emptyCells.Count; i++)
         {
             var instance = visibleInstances[i];
-            Vector3Int newPos = emptyCells[i];
+            string instanceKey = GetInstanceKey(instance);
+            Vector3Int newPos;
+
+            // Check if we have a stored position for this instance in the current view
+            if (viewPositions[currentView].ContainsKey(instanceKey))
+            {
+                newPos = viewPositions[currentView][instanceKey];
+            }
+            else
+            {
+                // If no stored position, use a cell from the sorted and shuffled list
+                newPos = emptyCells[i];
+                viewPositions[currentView][instanceKey] = newPos;
+            }
+
             Vector3 worldPos = tilemap.GetCellCenterWorld(newPos);
             worldPos.y += animalYOffset;
             
@@ -685,10 +722,14 @@ public class AnimalGridManager : MonoBehaviour
 
     private void SetView(string view)
     {
-        currentView = view;
-        UpdateGridVisibility();
-        SafeUpdateHatchCountUI();
-        Debug.Log($"View changed to: {view}");
+        if (view != currentView)
+        {
+            previousView = currentView;
+            currentView = view;
+            UpdateGridVisibility();
+            SafeUpdateHatchCountUI();
+            Debug.Log($"View changed to: {view}");
+        }
     }
 }
 
