@@ -19,9 +19,12 @@ public class MenuManager : MonoBehaviour
 
     void Start()
     {
-        menuPanel.SetActive(false);
-        menuButton.onClick.AddListener(OpenMenu);
-        Blackout.SetActive(false);
+        if (menuPanel != null)
+            menuPanel.SetActive(false);
+        if (menuButton != null)
+            menuButton.onClick.AddListener(OpenMenu);
+        if (Blackout != null)
+            Blackout.SetActive(false);
     }
 
     void Update()
