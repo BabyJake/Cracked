@@ -35,7 +35,7 @@ public class StudyTimer : MonoBehaviour
     private bool sessionFailed = false;
     private bool isProcessingGiveUp = false;
     private bool hasCreatedGraveThisSession = false;
-    private float sessionStartTime;
+    private System.DateTime sessionStartTime;
     private int coinsPerMinute = 5;
     private int lastCoinsEarned = 0;
 
@@ -49,7 +49,7 @@ public class StudyTimer : MonoBehaviour
     public CircularTimer circularTimer;
 
     private float savedTimeRemaining;
-    private float savedSessionStartTime;
+    private System.DateTime savedSessionStartTime;
     private bool wasTimerRunning;
 
     public static event System.Action<int> OnCoinsChanged;
@@ -181,7 +181,7 @@ public class StudyTimer : MonoBehaviour
         isTimerRunning = true;
         sessionFailed = false;
         hasCreatedGraveThisSession = false;
-        sessionStartTime = Time.time;
+        sessionStartTime = System.DateTime.Now; // Changed to real time
         Disc2.SetActive(false);
         Disc.SetActive(false);
         menu.SetActive(false);
@@ -230,8 +230,8 @@ public class StudyTimer : MonoBehaviour
 
     int AwardCoinsForSession(bool completed)
     {
-        float sessionDuration = Time.time - sessionStartTime;
-        int minutes = Mathf.FloorToInt(sessionDuration / 60f);
+        double sessionDuration = (System.DateTime.Now - sessionStartTime).TotalSeconds; // Changed to real time
+        int minutes = Mathf.FloorToInt((float)sessionDuration / 60f);
         int coinsEarned = minutes * coinsPerMinute;
         if (completed) coinsEarned += Mathf.RoundToInt(circularTimer.currentMinutes * 2);
         coinsEarned = Mathf.Max(coinsEarned, completed ? 1 : 0);
@@ -550,12 +550,15 @@ public class StudyTimer : MonoBehaviour
     private void SaveTimerState()
     {
         savedTimeRemaining = timeRemaining;
-        savedSessionStartTime = sessionStartTime;
+        savedSessionStartTime = System.DateTime.Now; // Changed to real time
         wasTimerRunning = isTimerRunning;
+        
         PlayerPrefs.SetFloat("SavedTimeRemaining", savedTimeRemaining);
-        PlayerPrefs.SetFloat("SavedSessionStartTime", savedSessionStartTime);
+        PlayerPrefs.SetString("SavedSessionStartTime", savedSessionStartTime.ToBinary().ToString()); // Save as real timestamp
         PlayerPrefs.SetInt("WasTimerRunning", wasTimerRunning ? 1 : 0);
         PlayerPrefs.Save();
+        
+        Debug.Log($"Timer state saved: Time remaining: {savedTimeRemaining}, Start time: {savedSessionStartTime}");
     }
 
     private void RestoreTimerState()
@@ -563,27 +566,81 @@ public class StudyTimer : MonoBehaviour
         if (PlayerPrefs.HasKey("WasTimerRunning") && PlayerPrefs.GetInt("WasTimerRunning") == 1)
         {
             savedTimeRemaining = PlayerPrefs.GetFloat("SavedTimeRemaining");
-            savedSessionStartTime = PlayerPrefs.GetFloat("SavedSessionStartTime");
+            
+            // Restore real timestamp
+            string startTimeString = PlayerPrefs.GetString("SavedSessionStartTime");
+            if (!string.IsNullOrEmpty(startTimeString))
+            {
+                long startTimeBinary = System.Convert.ToInt64(startTimeString);
+                savedSessionStartTime = System.DateTime.FromBinary(startTimeBinary);
+            }
+            else
+            {
+                savedSessionStartTime = System.DateTime.Now; // Fallback
+            }
+            
             wasTimerRunning = true;
             
-            // Calculate elapsed time while app was closed
-            float elapsedTime = Time.time - savedSessionStartTime;
-            timeRemaining = Mathf.Max(0, savedTimeRemaining - elapsedTime);
+            // Calculate elapsed time using real time difference
+            double elapsedSeconds = (System.DateTime.Now - savedSessionStartTime).TotalSeconds;
+            timeRemaining = Mathf.Max(0, savedTimeRemaining - (float)elapsedSeconds);
+            
+            Debug.Log($"Timer state restored: Elapsed time: {elapsedSeconds}s, Time remaining: {timeRemaining}s");
             
             if (timeRemaining > 0)
             {
                 isTimerRunning = true;
-                sessionStartTime = Time.time;
+                sessionStartTime = savedSessionStartTime; // Keep original start time for coin calculation
                 timerButtonLabel.text = "Give Up";
+                Disc2.SetActive(false);
+                Disc.SetActive(false);
+                menu.SetActive(false);
             }
             else
             {
+                // Timer finished while app was closed
                 isTimerRunning = false;
                 timeRemaining = 0;
+                sessionStartTime = savedSessionStartTime; // Keep original start time for coin calculation
                 lastCoinsEarned = AwardCoinsForSession(true);
                 HatchEgg();
                 timerButtonLabel.text = "Start Timer";
             }
+            
+            // Clear the saved state
+            PlayerPrefs.DeleteKey("SavedTimeRemaining");
+            PlayerPrefs.DeleteKey("SavedSessionStartTime");
+            PlayerPrefs.DeleteKey("WasTimerRunning");
+            PlayerPrefs.Save();
+        }
+    }
+
+    // Called when app goes to background
+    void OnApplicationPause(bool pauseStatus)
+    {
+        if (pauseStatus && isTimerRunning && !isProcessingGiveUp)
+        {
+            SaveTimerState();
+            Debug.Log("App paused - timer state saved");
+        }
+        else if (!pauseStatus)
+        {
+            Debug.Log("App resumed");
+            // RestoreTimerState is called in Start(), so no need to call it here again
+        }
+    }
+
+    // Called when app loses focus (iOS)
+    void OnApplicationFocus(bool hasFocus)
+    {
+        if (!hasFocus && isTimerRunning && !isProcessingGiveUp)
+        {
+            SaveTimerState();
+            Debug.Log("App lost focus - timer state saved");
+        }
+        else if (hasFocus)
+        {
+            Debug.Log("App gained focus");
         }
     }
 
@@ -593,38 +650,8 @@ public class StudyTimer : MonoBehaviour
         if (isTimerRunning && !isProcessingGiveUp)
         {
             SaveTimerState();
-            ApplyPenalty();
+            Debug.Log("App truly backgrounded - timer state saved");
         }
-    }
-
-    private void ApplyPenalty()
-    {
-        if (isProcessingGiveUp) return;
-        isProcessingGiveUp = true;
-
-        if (isTimerRunning)
-        {
-            lastCoinsEarned = AwardCoinsForSession(false);
-            isTimerRunning = false;
-            timeRemaining = 0;
-
-            if (currentEgg != null)
-            {
-                currentEgg.SetActive(false);
-                if (!hasCreatedGraveThisSession)
-                {
-                    string graveId = AddGraveToUnlockedList();
-                    hasCreatedGraveThisSession = true;
-                }
-            }
-
-            if (deathPopup != null) deathPopup.SetActive(true);
-            eggMenu.SetActive(false);
-            isInteractingWithEgg = false;
-            ResetToDefaultState();
-        }
-
-        isProcessingGiveUp = false;
     }
 
     void OnDestroy()
