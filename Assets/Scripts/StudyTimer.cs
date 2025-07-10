@@ -626,7 +626,7 @@ public class StudyTimer : MonoBehaviour
         else if (!pauseStatus)
         {
             Debug.Log("App resumed");
-            // RestoreTimerState is called in Start(), so no need to call it here again
+            RestoreTimerState(); // Restore timer state on resume
         }
     }
 
@@ -641,6 +641,7 @@ public class StudyTimer : MonoBehaviour
         else if (hasFocus)
         {
             Debug.Log("App gained focus");
+            RestoreTimerState(); // Restore timer state on focus gain
         }
     }
 
@@ -651,6 +652,16 @@ public class StudyTimer : MonoBehaviour
         {
             SaveTimerState();
             Debug.Log("App truly backgrounded - timer state saved");
+        }
+    }
+
+    // Save timer state when the app is quitting (extra safety)
+    void OnApplicationQuit()
+    {
+        if (isTimerRunning && !isProcessingGiveUp)
+        {
+            SaveTimerState();
+            Debug.Log("App quitting - timer state saved");
         }
     }
 
