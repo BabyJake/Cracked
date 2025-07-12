@@ -605,6 +605,7 @@ public class StudyTimer : MonoBehaviour
                 lastCoinsEarned = AwardCoinsForSession(true);
                 HatchEgg();
                 timerButtonLabel.text = "Start Timer";
+                // Note: HatchEgg() already handles the UI state correctly (hides menus, shows animal, etc.)
             }
             
             // Clear the saved state
