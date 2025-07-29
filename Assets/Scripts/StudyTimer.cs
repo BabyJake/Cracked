@@ -24,6 +24,10 @@ public class StudyTimer : MonoBehaviour
 
     [Header("Animal Settings")]
     public float animalHatchScale = 2f; // Adjust this in the Unity Inspector
+    public float animalRiseHeight = 1f; // Height the animal rises after hatching
+    
+    [Header("Egg Hatching Animation")]
+    public GameObject eggHatchAnimPrefab; // Assign your hatching animation prefab in the Inspector
 
     public GameObject giveUpPopup;
     public Button yesButton;
@@ -45,6 +49,7 @@ public class StudyTimer : MonoBehaviour
     private GameObject currentAnimal;
     private GameObject currentEggPrefab;
     private ShopItemSO currentEggSO;
+    private GameObject currentHatchAnim; // Track the spawned hatching animation
 
     public CircularTimer circularTimer;
 
@@ -269,7 +274,22 @@ public class StudyTimer : MonoBehaviour
     {
         if (currentEgg != null)
         {
+            Vector3 eggPosition = currentEgg.transform.position;
             Destroy(currentEgg);
+
+            // Spawn hatching animation
+            if (eggHatchAnimPrefab != null)
+            {
+                // Destroy previous if still present
+                if (currentHatchAnim != null)
+                {
+                    Destroy(currentHatchAnim);
+                }
+                // Spawn at new coordinates (0.42, -2.3, 0)
+                Vector3 hatchAnimPosition = new Vector3(0.42f, -2.3f, 0f);
+                currentHatchAnim = Instantiate(eggHatchAnimPrefab, hatchAnimPosition, Quaternion.identity);
+            }
+
             SpawnRandomAnimal();
             if (eggMenuSlide != null)
             {
@@ -316,9 +336,16 @@ public class StudyTimer : MonoBehaviour
 
             if (selectedAnimal != null)
             {
-                currentAnimal = Instantiate(selectedAnimal, spawnPoint.position, Quaternion.identity);
+                // Spawn at the egg's position
+                Vector3 spawnPos = currentEgg != null ? currentEgg.transform.position : spawnPoint.position;
+                currentAnimal = Instantiate(selectedAnimal, spawnPos, Quaternion.identity);
                 // Scale up the animal for the hatching scene using the public variable
                 currentAnimal.transform.localScale = new Vector3(animalHatchScale, animalHatchScale, animalHatchScale);
+
+                // Animate the animal rising up using the public variable
+                Vector3 targetPos = spawnPos + new Vector3(0, animalRiseHeight, 0);
+                currentAnimal.transform.DOMove(targetPos, 1f).SetEase(Ease.OutCubic);
+
                 string animalName = selectedAnimal.name.Replace("(Clone)", "").Trim();
                 animalNameText.text = animalName;
                 unlockCoinRewardText.text = $"+{lastCoinsEarned}";
@@ -335,9 +362,16 @@ public class StudyTimer : MonoBehaviour
         {
             // Fallback to random selection if no spawn chances are defined
             GameObject randomAnimal = animalPrefabs[Random.Range(0, animalPrefabs.Count)];
-            currentAnimal = Instantiate(randomAnimal, spawnPoint.position, Quaternion.identity);
+            // Spawn at the egg's position
+            Vector3 spawnPos = currentEgg != null ? currentEgg.transform.position : spawnPoint.position;
+            currentAnimal = Instantiate(randomAnimal, spawnPos, Quaternion.identity);
             // Scale up the animal for the hatching scene using the public variable
             currentAnimal.transform.localScale = new Vector3(animalHatchScale, animalHatchScale, animalHatchScale);
+
+            // Animate the animal rising up using the public variable
+            Vector3 targetPos = spawnPos + new Vector3(0, animalRiseHeight, 0);
+            currentAnimal.transform.DOMove(targetPos, 1f).SetEase(Ease.OutCubic);
+
             string animalName = randomAnimal.name.Replace("(Clone)", "").Trim();
             animalNameText.text = animalName;
             unlockCoinRewardText.text = $"+{lastCoinsEarned}";
@@ -413,6 +447,13 @@ public class StudyTimer : MonoBehaviour
         else
         {
             SpawnEgg();
+        }
+
+        // Destroy hatching animation if present
+        if (currentHatchAnim != null)
+        {
+            Destroy(currentHatchAnim);
+            currentHatchAnim = null;
         }
 
         if (circularTimer != null)
@@ -506,6 +547,13 @@ public class StudyTimer : MonoBehaviour
             currentAnimal = null;
         }
 
+        // Destroy hatching animation if present
+        if (currentHatchAnim != null)
+        {
+            Destroy(currentHatchAnim);
+            currentHatchAnim = null;
+        }
+
         SpawnEgg();
         timerButtonLabel.text = "Start Timer";
         Disc.SetActive(true);
@@ -530,6 +578,12 @@ public class StudyTimer : MonoBehaviour
 
     public void AddToZoo()
     {
+        // Destroy hatching animation if present before switching scenes
+        if (currentHatchAnim != null)
+        {
+            Destroy(currentHatchAnim);
+            currentHatchAnim = null;
+        }
         SceneManager.LoadScene("Sanctuary");
     }
 

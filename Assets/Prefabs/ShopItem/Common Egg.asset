@@ -15,7 +15,7 @@ MonoBehaviour:
   title: CommonEgg
   description: 
   baseCost: 10
-  itemPrefab: {fileID: 7073543684970146418, guid: 147325d3ace99ad40b67b78ad475fd4a, type: 3}
+  itemPrefab: {fileID: 8623649159546200274, guid: eb633ce339d1b4b0d9e0155232e36983, type: 3}
   itemImage: {fileID: 0}
   animalSpawnChances:
   - animalPrefab: {fileID: 8836156634002637495, guid: 2b8e422581ff2f1449c023ed530aaf24, type: 3}
