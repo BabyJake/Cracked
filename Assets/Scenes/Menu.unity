@@ -2073,6 +2073,7 @@ GameObject:
   - component: {fileID: 488926798}
   - component: {fileID: 488926799}
   - component: {fileID: 488926800}
+  - component: {fileID: 488926801}
   m_Layer: 0
   m_Name: GameManager
   m_TagString: Untagged
@@ -2151,6 +2152,18 @@ MonoBehaviour:
   eggButtonPrefab: {fileID: 2191707331219733840, guid: 22a51438533859047a26836554f4a48c, type: 3}
   defaultEggSO: {fileID: 11400000, guid: 614f9dc3915425f44be7274a42479e0b, type: 2}
   totalEggsBoughtText: {fileID: 1413264627}
+--- !u!114 &488926801
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 488926796}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 78d7b2d16099442eb9b91dee7328f258, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &519420028
 GameObject:
   m_ObjectHideFlags: 0
@@ -4384,7 +4397,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 1, y: 1}
-  m_AnchoredPosition: {x: -61, y: 84}
+  m_AnchoredPosition: {x: -60.99997, y: 84}
   m_SizeDelta: {x: -597.34, y: -1572.3}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &1155190365
